@@ -7,6 +7,7 @@ import { TeamPanel } from './components/TeamPanel';
 import { WinnerDialog } from './components/WinnerDialog';
 import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore } from './domain/game';
 import { useGame } from './state/useGame';
+import { useWakeLock } from './state/useWakeLock';
 
 const ROTATE_KEY = 'jasstafel.rotateTop';
 
@@ -22,6 +23,7 @@ type Open = { kind: 'meld' | 'points'; team: TeamIndex } | { kind: 'menu' } | nu
 
 export default function App() {
   const [state, dispatch] = useGame();
+  useWakeLock();
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
   const winner = gameWinner(state);
