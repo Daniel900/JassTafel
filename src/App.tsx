@@ -7,6 +7,8 @@ import { TeamPanel } from './components/TeamPanel';
 import { WinnerDialog } from './components/WinnerDialog';
 import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore } from './domain/game';
 import { useGame } from './state/useGame';
+import { useIdle } from './state/useIdle';
+import { usePixelShift } from './state/usePixelShift';
 import { useWakeLock } from './state/useWakeLock';
 
 const ROTATE_KEY = 'jasstafel.rotateTop';
@@ -27,6 +29,9 @@ export default function App() {
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
   const winner = gameWinner(state);
+  // Black outline mode after 30 s without a tap (not while a dialog is open) – protects OLED screens.
+  const idle = useIdle(undefined, open !== null || winner !== null);
+  const [shiftX, shiftY] = usePixelShift();
 
   const toggleRotate = () => {
     const next = !rotateTop;
@@ -65,7 +70,11 @@ export default function App() {
   );
 
   return (
-    <main className="tafel">
+    <main
+      className={`tafel${idle ? ' tafel--idle' : ''}`}
+      data-testid="tafel"
+      style={{ transform: `translate(${shiftX}px, ${shiftY}px)` }}
+    >
       {panel(0)}
       <CenterBar
         round={state.round}

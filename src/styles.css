@@ -14,6 +14,8 @@
   --card-border: #94a3b8;
   --card-red: #c81e1e;
   --card-black: #111827;
+  /* Lines and text of the black outline mode (OLED protection) */
+  --idle-fg: #b0b0b0;
   color-scheme: light;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
@@ -270,3 +272,24 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 .winner__trophy { font-size: 3.5rem; }
 .winner__title { margin: 0; font-size: 1.6rem; }
 .history__trump { color: var(--surface-muted); font-size: 0.8rem; }
+
+/* ---- Black outline mode: after 30 s without a tap (OLED burn-in protection) ---- */
+.tafel { transition: transform 1.5s ease; }
+.tafel .team, .tafel .center-bar { transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease; }
+body:has(.tafel--idle) { background: #000; }
+.tafel--idle { background: #000; }
+.tafel--idle .team { background: #000; color: var(--idle-fg); }
+.tafel--idle .team__name,
+.tafel--idle .team__remaining { color: var(--idle-fg); }
+.tafel--idle .center-bar { background: #000; color: var(--idle-fg); border-block: 1px solid var(--idle-fg); }
+.tafel--idle .primary-btn,
+.tafel--idle .secondary-btn {
+  background: transparent;
+  color: var(--idle-fg);
+  border: 1px solid var(--idle-fg);
+}
+.tafel--idle .chip { background: transparent; border: 1px solid var(--idle-fg); }
+.tafel--idle .chip strong { color: var(--idle-fg); }
+.tafel--idle .chip__remove { background: transparent; color: var(--idle-fg); }
+.tafel--idle .trump-badge { border: 1px dashed var(--idle-fg); color: var(--idle-fg); background: transparent; opacity: 0.6; }
+.tafel--idle .trump-badge.active { border: 1px solid var(--idle-fg); color: var(--idle-fg); background: transparent; opacity: 1; }
