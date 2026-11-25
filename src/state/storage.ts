@@ -1,4 +1,5 @@
 import { type GameState, createGame } from '../domain/game';
+import type { Meld } from '../domain/melds';
 
 export const STORAGE_KEY = 'jasstafel.game.v1';
 
@@ -16,6 +17,14 @@ function isGameState(value: unknown): value is GameState {
   );
 }
 
+/** Older versions stored the full highest card of a sequence – only its rank is needed now. */
+function migrateMeld(saved: Meld): Meld {
+  const { highCard, ...meld } = saved as Meld & { highCard?: { rank: Meld['rank'] } };
+  return highCard && !meld.rank ? { ...meld, rank: highCard.rank } : meld;
+}
+
+const migrateMelds = (pair: [Meld[], Meld[]]): [Meld[], Meld[]] => [pair[0].map(migrateMeld), pair[1].map(migrateMeld)];
+
 /** Fills in fields added after the first release so older saved games still load. */
 function migrate(saved: GameState): GameState {
   // Older versions stored a trump suit, which is no longer used.
@@ -23,9 +32,10 @@ function migrate(saved: GameState): GameState {
   return {
     ...state,
     trumpTeam: state.trumpTeam ?? (((state.round - 1) % 2) as 0 | 1),
+    pendingMelds: migrateMelds(state.pendingMelds),
     history: state.history.map((round, i) => {
       const { trump: _t, ...r } = round as typeof round & { trump?: unknown };
-      return { ...r, trumpTeam: r.trumpTeam ?? ((i % 2) as 0 | 1) };
+      return { ...r, melds: migrateMelds(r.melds), trumpTeam: r.trumpTeam ?? ((i % 2) as 0 | 1) };
     }),
   };
 }

@@ -1,4 +1,4 @@
-import { type Card, type Rank, RANKS, RANK_NAMES, cardLabel, rankIndex } from './cards';
+import { type Rank, RANKS, RANK_NAMES, rankIndex } from './cards';
 
 export type MeldType =
   | 'dreiblatt'
@@ -12,9 +12,10 @@ export type MeldType =
 export interface Meld {
   id: string;
   type: MeldType;
-  /** Highest card of a sequence (Dreiblatt/Vierblatt/Fünfblatt). */
-  highCard?: Card;
-  /** Rank of a Vierling (four cards of one type). */
+  /**
+   * Highest card of a sequence (Dreiblatt/Vierblatt/Fünfblatt) or the card of a Vierling.
+   * The suit is not needed – it never matters for the rules.
+   */
   rank?: Rank;
 }
 
@@ -24,7 +25,7 @@ export interface MeldDefinition {
   points: number;
   description: string;
   /** What the user has to select additionally. */
-  needs: 'highCard' | 'rank' | 'nothing';
+  needs: 'highRank' | 'rank' | 'nothing';
   /** Number of cards of a sequence (only for sequences). */
   length?: number;
   /** Order among melds with the same points (higher wins). */
@@ -37,7 +38,7 @@ export const MELD_DEFINITIONS: Record<MeldType, MeldDefinition> = {
     name: 'Dreiblatt',
     points: 20,
     description: '3 aufeinanderfolgende Karten derselben Farbe',
-    needs: 'highCard',
+    needs: 'highRank',
     length: 3,
     priority: 0,
   },
@@ -46,7 +47,7 @@ export const MELD_DEFINITIONS: Record<MeldType, MeldDefinition> = {
     name: 'Vierblatt',
     points: 50,
     description: '4 aufeinanderfolgende Karten derselben Farbe',
-    needs: 'highCard',
+    needs: 'highRank',
     length: 4,
     priority: 0,
   },
@@ -55,7 +56,7 @@ export const MELD_DEFINITIONS: Record<MeldType, MeldDefinition> = {
     name: 'Fünfblatt',
     points: 100,
     description: '5 aufeinanderfolgende Karten derselben Farbe',
-    needs: 'highCard',
+    needs: 'highRank',
     length: 5,
     priority: 1,
   },
@@ -119,8 +120,8 @@ export const isCompetingMeld = (meld: Meld): boolean => meld.type !== 'steck';
 export function isValidMeld(meld: Meld): boolean {
   const def = MELD_DEFINITIONS[meld.type];
   if (!def) return false;
-  if (def.needs === 'highCard') {
-    return !!meld.highCard && possibleHighRanks(def.length!).includes(meld.highCard.rank);
+  if (def.needs === 'highRank') {
+    return !!meld.rank && possibleHighRanks(def.length!).includes(meld.rank);
   }
   if (def.needs === 'rank') {
     return !!meld.rank && VIERLING_RANKS.includes(meld.rank);
@@ -129,9 +130,7 @@ export function isValidMeld(meld: Meld): boolean {
 }
 
 function meldRankIndex(meld: Meld): number {
-  if (meld.highCard) return rankIndex(meld.highCard.rank);
-  if (meld.rank) return rankIndex(meld.rank);
-  return 0;
+  return meld.rank ? rankIndex(meld.rank) : 0;
 }
 
 /**
@@ -212,7 +211,12 @@ export function evaluateMelds(
 
 export function describeMeld(meld: Meld): string {
   const def = MELD_DEFINITIONS[meld.type];
-  if (meld.highCard) return `${def.name} bis ${cardLabel(meld.highCard)}`;
-  if (meld.rank) return `${def.name} ${RANK_NAMES[meld.rank]}`;
-  return def.name;
+  if (!meld.rank) return def.name;
+  return def.needs === 'highRank' ? `${def.name} bis ${RANK_NAMES[meld.rank]}` : `${def.name} ${RANK_NAMES[meld.rank]}`;
+}
+
+/** The ranks of a sequence ending with the given highest rank, e.g. 3 / Ass → Dame, König, Ass. */
+export function sequenceRanks(length: number, highRank: Rank): Rank[] {
+  const end = rankIndex(highRank) + 1;
+  return RANKS.slice(end - length, end);
 }

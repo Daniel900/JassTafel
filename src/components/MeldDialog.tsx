@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { type Card, type Rank, SUITS, RANK_NAMES } from '../domain/cards';
-import { type Meld, type MeldType, MELD_DEFINITIONS, MELD_ORDER, VIERLING_RANKS, possibleHighRanks } from '../domain/melds';
-import { CardFan, CardImage } from './CardImage';
+import { type Rank, SUITS, RANK_NAMES } from '../domain/cards';
+import { type Meld, type MeldType, MELD_DEFINITIONS, MELD_ORDER, VIERLING_RANKS, possibleHighRanks, sequenceRanks } from '../domain/melds';
+import { CardFan } from './CardImage';
 import { Dialog } from './Dialog';
 import { MeldIcon } from './MeldIcon';
 
@@ -53,21 +53,21 @@ export function MeldDialog({ teamName, rotated, onAdd, onClose }: Props) {
       <button type="button" className="link-btn" onClick={() => setType(null)}>
         ‹ Zurück
       </button>
-      {def.needs === 'highCard' ? (
+      {def.needs === 'highRank' ? (
         <>
-          <p className="hint">Höchste Karte wählen:</p>
-          <div className="card-picker">
-            {SUITS.map((suit) => (
-              <div key={suit} className="card-picker__row">
-                {possibleHighRanks(def.length!).map((rank) => {
-                  const card: Card = { suit, rank };
-                  return (
-                    <button key={rank} type="button" className="card-btn" onClick={() => add({ type, highCard: card })}>
-                      <CardImage card={card} width={44} />
-                    </button>
-                  );
-                })}
-              </div>
+          <p className="hint">Bis zu welcher Karte?</p>
+          <div className="rank-picker">
+            {possibleHighRanks(def.length!).map((rank) => (
+              <button
+                key={rank}
+                type="button"
+                className="meld-option"
+                aria-label={`${def.name} bis ${RANK_NAMES[rank]}`}
+                onClick={() => add({ type, rank })}
+              >
+                <CardFan cards={sequenceRanks(def.length!, rank).map((r) => ({ suit: 'herz' as const, rank: r }))} width={30} />
+                <span className="meld-option__name">bis {RANK_NAMES[rank]}</span>
+              </button>
             ))}
           </div>
         </>

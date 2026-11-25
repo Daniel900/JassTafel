@@ -14,11 +14,11 @@ describe('App', () => {
     const { unmount } = render(<App />);
     expect(screen.getByTestId('round')).toHaveTextContent('Runde 1');
 
-    // Team 2 melds a Vierblatt up to Pik Ass
+    // Team 2 melds a Vierblatt up to Ass
     await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Melden' }));
     await user.click(screen.getByRole('button', { name: 'Vierblatt' }));
-    await user.click(screen.getByRole('img', { name: 'Pik Ass' }));
-    expect(within(screen.getByTestId('team-1')).getByText(/Vierblatt bis Pik Ass/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Vierblatt bis Ass' }));
+    expect(within(screen.getByTestId('team-1')).getByText(/Vierblatt bis Ass/)).toBeInTheDocument();
 
     // Team 1 has a Steck
     await user.click(within(screen.getByTestId('team-0')).getByRole('button', { name: 'Melden' }));

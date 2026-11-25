@@ -6,7 +6,7 @@ import { PointsDialog } from './PointsDialog';
 const state = gameReducer(createGame(), {
   type: 'addMeld',
   team: 0,
-  meld: { id: 'm', type: 'vierblatt', highCard: { suit: 'herz', rank: 'A' } },
+  meld: { id: 'm', type: 'vierblatt', rank: 'A' },
 });
 
 const setup = (team: 0 | 1 = 0) => {
