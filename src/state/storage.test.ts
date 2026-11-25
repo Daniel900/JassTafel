@@ -34,6 +34,14 @@ describe('storage', () => {
     expect(loaded.history[0]).not.toHaveProperty('trump');
   });
 
+  it('migrates sequence melds that stored the full highest card', () => {
+    const g = createGame();
+    const old = JSON.parse(JSON.stringify(g));
+    old.pendingMelds[0] = [{ id: 'a', type: 'dreiblatt', highCard: { suit: 'herz', rank: 'A' } }];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(old));
+    expect(loadGame().pendingMelds[0]).toEqual([{ id: 'a', type: 'dreiblatt', rank: 'A' }]);
+  });
+
   it('does not throw if storage is unavailable', () => {
     const broken = {
       getItem: () => {

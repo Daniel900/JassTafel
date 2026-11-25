@@ -20,18 +20,21 @@ describe('MeldDialog', () => {
   it('asks for the highest card of a Dreiblatt', async () => {
     const { onAdd, onClose, user } = setup();
     await user.click(screen.getByRole('button', { name: 'Dreiblatt' }));
-    // 7 and 8 cannot be the highest card of a Dreiblatt
-    expect(screen.queryByRole('img', { name: 'Herz 8' })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('img', { name: 'Herz Ass' }));
-    expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ type: 'dreiblatt', highCard: { suit: 'herz', rank: 'A' } }));
+    // only the highest card is chosen, no suit; 7 and 8 cannot be the highest card
+    expect(screen.queryByRole('button', { name: 'Dreiblatt bis 8' })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^Dreiblatt bis / })).toHaveLength(6);
+    await user.click(screen.getByRole('button', { name: 'Dreiblatt bis Ass' }));
+    expect(onAdd).toHaveBeenCalledWith(expect.objectContaining({ type: 'dreiblatt', rank: 'A' }));
+    expect(onAdd.mock.calls[0][0]).not.toHaveProperty('highCard');
     expect(onClose).toHaveBeenCalled();
   });
 
   it('only offers valid highest cards for a Fünfblatt', async () => {
     const { user } = setup();
     await user.click(screen.getByRole('button', { name: 'Fünfblatt' }));
-    expect(screen.queryByRole('img', { name: 'Pik 10' })).not.toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Pik Bauer' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Fünfblatt bis 10' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Fünfblatt bis Bauer' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^Fünfblatt bis / })).toHaveLength(4);
   });
 
   it('asks for the card type of a Vierling', async () => {

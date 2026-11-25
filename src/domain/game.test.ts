@@ -1,7 +1,7 @@
 import { TARGET_SCORE, createGame, gameReducer, gameWinner, previewRound, totalScore } from './game';
 import type { Meld } from './melds';
 
-const dreiblatt: Meld = { id: 'a', type: 'dreiblatt', highCard: { suit: 'herz', rank: 'A' } };
+const dreiblatt: Meld = { id: 'a', type: 'dreiblatt', rank: 'A' };
 const steck: Meld = { id: 'b', type: 'steck' };
 
 describe('game', () => {
