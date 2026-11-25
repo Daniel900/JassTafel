@@ -12,7 +12,6 @@ describe('TeamPanel', () => {
         total={412}
         remaining={588}
         hasTrump
-        trump="herz"
         melds={[{ id: 's', type: 'steck' }]}
         rotated
         {...handlers}
@@ -31,7 +30,7 @@ describe('TeamPanel', () => {
     expect(handlers.onRemoveMeld).toHaveBeenCalledWith('s');
     expect(handlers.onRename).toHaveBeenCalled();
     expect(screen.getByTestId('remaining-0')).toHaveTextContent('noch 588');
-    expect(screen.getByTestId('trump-badge-0')).toHaveTextContent('Trumpf ♥');
+    expect(screen.getByTestId('trump-badge-0')).toHaveTextContent('Trumpf');
   });
 
   it('lets a team take Trumpf and disables actions when the game is over', async () => {
@@ -43,7 +42,6 @@ describe('TeamPanel', () => {
         total={1000}
         remaining={0}
         hasTrump={false}
-        trump={null}
         melds={[]}
         disabled
         onTakeTrump={onTakeTrump}

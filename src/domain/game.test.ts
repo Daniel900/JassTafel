@@ -26,14 +26,12 @@ describe('game', () => {
 
   it('confirms a round: other team auto-calculated, melds added, next round', () => {
     let g = gameReducer(createGame(), { type: 'addMeld', team: 1, meld: dreiblatt });
-    g = gameReducer(g, { type: 'setTrump', trump: 'pik' });
     g = gameReducer(g, { type: 'confirmRound', team: 0, points: 90 });
     expect(g.round).toBe(2);
     expect(totalScore(g, 0)).toBe(90);
     expect(totalScore(g, 1)).toBe(67 + 20);
     expect(g.pendingMelds).toEqual([[], []]);
-    expect(g.trump).toBeNull();
-    expect(g.history[0]).toMatchObject({ number: 1, trump: 'pik', cardPoints: [90, 67], meldPoints: [0, 20] });
+    expect(g.history[0]).toMatchObject({ number: 1, trumpTeam: 0, cardPoints: [90, 67], meldPoints: [0, 20] });
   });
 
   it('handles a Match entered by the second team', () => {
@@ -71,7 +69,6 @@ describe('game', () => {
   it('lets the higher total win if both teams pass the target in the same round', () => {
     const round = (n: number, cards: [number, number], melds: [number, number], trumpTeam: 0 | 1) => ({
       number: n,
-      trump: null,
       cardPoints: cards,
       meldPoints: melds,
       melds: [[], []] as [Meld[], Meld[]],

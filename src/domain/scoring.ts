@@ -1,4 +1,4 @@
-/** Total card points of one round (sum of all 32 cards with a trump suit). */
+/** Total card points of one round (all 32 cards incl. trump + 5 for the last trick). */
 export const ROUND_TOTAL = 157;
 /** Points a team gets if it takes all card points (a "Match"). */
 export const MATCH_POINTS = 257;

@@ -9,7 +9,7 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 - Split screen: each team has its own half. By default the top half is rotated 180° so the phone can lie between the teams (you can turn this off in the menu).
 - **Melden** with card images: choose the meld type, then choose the highest card (also shown as an image) if the meld needs one.
 - **Punkte**: one team enters its card points and the other team's points are calculated automatically. Melds are added according to the rules when the round is confirmed.
-- **Trumpf indicator**: shows which team has Trumpf. It switches sides after every round, and you can tap it to correct it. You can also select the trump suit.
+- **Trumpf indicator**: shows which team has Trumpf (chose trump) this round. It switches sides after every round, and you can tap it to correct it. The trump suit itself isn't entered: you count the card points yourself, and only the team with Trumpf matters for the rules.
 - **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.
 - Round counter, history, undo of the last round, team names and "Neues Spiel".
 
@@ -45,7 +45,7 @@ If one team won **all tricks**, tap the **Match** preset next to the input field
 
 - Only the team with the **highest single meld** gets its melds counted (all of them), and only if that team made at least one card point.
 - If that team made **no** card point, the **other team** gets its melds counted instead (if it has any).
-- Melds are compared by points first. When the points are equal, Fünfblatt beats Vierling. After that, the higher card wins. If the cards are also equal, a sequence in the trump suit wins (if a trump suit is selected). If two melds are still exactly equal, the **team with Trumpf** wins.
+- Melds are compared by points first. When the points are equal, Fünfblatt beats Vierling. After that, the higher card wins. The suit never matters: if two melds are exactly equal, the **team with Trumpf** (the team that chose trump this round) wins.
 - **Steck** always counts, even if the team made no points.
 - Sequences longer than five cards are not handled.
 

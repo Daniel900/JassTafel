@@ -1,4 +1,3 @@
-import type { Suit } from './cards';
 import { type Meld, type MeldResult, evaluateMelds, isValidMeld } from './melds';
 import { splitRoundPoints } from './scoring';
 
@@ -12,7 +11,6 @@ export interface Team {
 
 export interface RoundResult {
   number: number;
-  trump: Suit | null;
   cardPoints: [number, number];
   meldPoints: [number, number];
   melds: [Meld[], Meld[]];
@@ -31,8 +29,6 @@ export interface GameState {
   teams: [Team, Team];
   /** Number of the round currently being played (starts at 1). */
   round: number;
-  /** Trump suit of the current round (optional, a sequence in trump wins a tie). */
-  trump: Suit | null;
   /** Team that has Trumpf this round – alternates every round, wins equal melds. */
   trumpTeam: TeamIndex;
   /** Melds announced during the current round. */
@@ -45,7 +41,6 @@ export const createGame = (teams: [string, string] = ['Team 1', 'Team 2']): Game
   mode: 'schieber',
   teams: [{ name: teams[0] }, { name: teams[1] }],
   round: 1,
-  trump: null,
   trumpTeam: 0,
   pendingMelds: [[], []],
   history: [],
@@ -54,7 +49,6 @@ export const createGame = (teams: [string, string] = ['Team 1', 'Team 2']): Game
 export type GameAction =
   | { type: 'addMeld'; team: TeamIndex; meld: Meld }
   | { type: 'removeMeld'; team: TeamIndex; id: string }
-  | { type: 'setTrump'; trump: Suit | null }
   | { type: 'setTrumpTeam'; team: TeamIndex }
   | { type: 'confirmRound'; team: TeamIndex; points: number }
   | { type: 'undoRound' }
@@ -79,7 +73,7 @@ export function previewRound(
   entered: number,
 ): { cardPoints: [number, number]; melds: MeldResult } {
   const cardPoints = cardPointsFor(team, entered);
-  return { cardPoints, melds: evaluateMelds(state.pendingMelds, cardPoints, state.trump, state.trumpTeam) };
+  return { cardPoints, melds: evaluateMelds(state.pendingMelds, cardPoints, state.trumpTeam) };
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -93,8 +87,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const list = state.pendingMelds[action.team].filter((m) => m.id !== action.id);
       return { ...state, pendingMelds: updateTeamList(state.pendingMelds, action.team, list) };
     }
-    case 'setTrump':
-      return { ...state, trump: action.trump };
     case 'setTrumpTeam':
       return { ...state, trumpTeam: action.team };
     case 'confirmRound': {
@@ -102,7 +94,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const { cardPoints, melds } = previewRound(state, action.team, action.points);
       const result: RoundResult = {
         number: state.round,
-        trump: state.trump,
         cardPoints,
         meldPoints: melds.points,
         melds: state.pendingMelds,
@@ -112,7 +103,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         round: state.round + 1,
-        trump: null,
         trumpTeam: other(state.trumpTeam),
         pendingMelds: [[], []],
         history: [...state.history, result],
@@ -124,7 +114,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         round: last.number,
-        trump: last.trump,
         trumpTeam: last.trumpTeam,
         pendingMelds: last.melds,
         history: state.history.slice(0, -1),

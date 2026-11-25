@@ -1,4 +1,3 @@
-import { SUIT_SYMBOLS } from '../domain/cards';
 import type { GameState } from '../domain/game';
 import { describeMeld } from '../domain/melds';
 import { Dialog } from './Dialog';
@@ -50,7 +49,7 @@ export function MenuDialog({ state, rotateTop, onToggleRotate, onUndo, onNewGame
               <tr key={r.number}>
                 <td>
                   {r.number}
-                  {r.trump ? ` ${SUIT_SYMBOLS[r.trump]}` : ''}
+                  <span className="history__trump"> · T{r.trumpTeam + 1}</span>
                 </td>
                 {([0, 1] as const).map((t) => (
                   <td key={t} title={r.melds[t].map(describeMeld).join(', ')}>

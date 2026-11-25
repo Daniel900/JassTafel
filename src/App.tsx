@@ -53,8 +53,7 @@ export default function App() {
       melds={state.pendingMelds[team]}
       rotated={isRotated(team)}
       hasTrump={state.trumpTeam === team}
-      trump={state.trump}
-      disabled={winner !== null}
+            disabled={winner !== null}
       onTakeTrump={() => dispatch({ type: 'setTrumpTeam', team })}
       onMeld={() => setOpen({ kind: 'meld', team })}
       onPoints={() => setOpen({ kind: 'points', team })}
@@ -68,8 +67,6 @@ export default function App() {
       {panel(0)}
       <CenterBar
         round={state.round}
-        trump={state.trump}
-        onTrump={(trump) => dispatch({ type: 'setTrump', trump })}
         onMenu={() => setOpen({ kind: 'menu' })}
       />
       {panel(1)}

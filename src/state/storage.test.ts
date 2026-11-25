@@ -24,10 +24,14 @@ describe('storage', () => {
     const old = JSON.parse(JSON.stringify(g));
     delete old.trumpTeam;
     delete old.history[0].trumpTeam;
+    old.trump = 'herz';
+    old.history[0].trump = null;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(old));
     const loaded = loadGame();
     expect(loaded.trumpTeam).toBe(1);
     expect(loaded.history[0].trumpTeam).toBe(0);
+    expect(loaded).not.toHaveProperty('trump');
+    expect(loaded.history[0]).not.toHaveProperty('trump');
   });
 
   it('does not throw if storage is unavailable', () => {
