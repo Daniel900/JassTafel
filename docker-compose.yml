@@ -1,0 +1,15 @@
+# Jass Tafel – run on your server with:  docker compose up -d
+# The app is fully static; the game state is stored in the browser (localStorage),
+# so no database or other backend component is needed.
+services:
+  jasstafel:
+    image: ${JASSTAFEL_IMAGE:-ghcr.io/daniel900/jasstafel:latest}
+    container_name: jasstafel
+    restart: unless-stopped
+    ports:
+      - "${JASSTAFEL_PORT:-8080}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
