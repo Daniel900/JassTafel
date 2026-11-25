@@ -1,4 +1,4 @@
-import { createGame, gameReducer, previewRound, totalScore } from './game';
+import { TARGET_SCORE, createGame, gameReducer, gameWinner, previewRound, totalScore } from './game';
 import type { Meld } from './melds';
 
 const dreiblatt: Meld = { id: 'a', type: 'dreiblatt', highCard: { suit: 'herz', rank: 'A' } };
@@ -38,9 +38,52 @@ describe('game', () => {
 
   it('handles a Match entered by the second team', () => {
     let g = gameReducer(createGame(), { type: 'addMeld', team: 0, meld: steck });
-    g = gameReducer(g, { type: 'confirmRound', team: 1, points: 157 });
+    g = gameReducer(g, { type: 'confirmRound', team: 1, points: 257 });
     expect(totalScore(g, 1)).toBe(257);
     expect(totalScore(g, 0)).toBe(20);
+  });
+
+  it('alternates the team with Trumpf every round and restores it on undo', () => {
+    let g = createGame();
+    expect(g.trumpTeam).toBe(0);
+    g = gameReducer(g, { type: 'confirmRound', team: 0, points: 80 });
+    expect(g.trumpTeam).toBe(1);
+    g = gameReducer(g, { type: 'setTrumpTeam', team: 0 });
+    g = gameReducer(g, { type: 'confirmRound', team: 0, points: 80 });
+    expect(g.history[1].trumpTeam).toBe(0);
+    expect(g.trumpTeam).toBe(1);
+    g = gameReducer(g, { type: 'undoRound' });
+    expect(g.trumpTeam).toBe(0);
+  });
+
+  it('ends the game at the target score of 1000', () => {
+    expect(TARGET_SCORE).toBe(1000);
+    let g = createGame();
+    for (let i = 0; i < 3; i++) g = gameReducer(g, { type: 'confirmRound', team: 0, points: 257 });
+    expect(gameWinner(g)).toBeNull(); // 771
+    g = gameReducer(g, { type: 'confirmRound', team: 0, points: 257 });
+    expect(totalScore(g, 0)).toBe(1028);
+    expect(gameWinner(g)).toBe(0);
+    // no more rounds once the game is over
+    expect(gameReducer(g, { type: 'confirmRound', team: 1, points: 100 })).toBe(g);
+  });
+
+  it('lets the higher total win if both teams pass the target in the same round', () => {
+    const round = (n: number, cards: [number, number], melds: [number, number], trumpTeam: 0 | 1) => ({
+      number: n,
+      trump: null,
+      cardPoints: cards,
+      meldPoints: melds,
+      melds: [[], []] as [Meld[], Meld[]],
+      enteredBy: 0 as const,
+      trumpTeam,
+    });
+    const base = { ...createGame(), history: [round(1, [950, 900], [0, 0], 0)] };
+    expect(gameWinner(base)).toBeNull();
+    const higher = { ...base, history: [...base.history, round(2, [57, 100], [0, 50], 1)] };
+    expect(gameWinner(higher)).toBe(1); // 1007 : 1050
+    const equal = { ...base, history: [...base.history, round(2, [57, 107], [0, 0], 0)] };
+    expect(gameWinner(equal)).toBe(0); // 1007 : 1007 → team with Trumpf
   });
 
   it('previews without changing state', () => {

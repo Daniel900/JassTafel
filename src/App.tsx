@@ -4,7 +4,8 @@ import { MeldDialog } from './components/MeldDialog';
 import { MenuDialog } from './components/MenuDialog';
 import { PointsDialog } from './components/PointsDialog';
 import { TeamPanel } from './components/TeamPanel';
-import { type TeamIndex, totalScore } from './domain/game';
+import { WinnerDialog } from './components/WinnerDialog';
+import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore } from './domain/game';
 import { useGame } from './state/useGame';
 
 const ROTATE_KEY = 'jasstafel.rotateTop';
@@ -23,6 +24,7 @@ export default function App() {
   const [state, dispatch] = useGame();
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
+  const winner = gameWinner(state);
 
   const toggleRotate = () => {
     const next = !rotateTop;
@@ -47,8 +49,13 @@ export default function App() {
       index={team}
       name={state.teams[team].name}
       total={totalScore(state, team)}
+      remaining={Math.max(0, TARGET_SCORE - totalScore(state, team))}
       melds={state.pendingMelds[team]}
       rotated={isRotated(team)}
+      hasTrump={state.trumpTeam === team}
+      trump={state.trump}
+      disabled={winner !== null}
+      onTakeTrump={() => dispatch({ type: 'setTrumpTeam', team })}
       onMeld={() => setOpen({ kind: 'meld', team })}
       onPoints={() => setOpen({ kind: 'points', team })}
       onRemoveMeld={(id) => dispatch({ type: 'removeMeld', team, id })}
@@ -67,6 +74,15 @@ export default function App() {
       />
       {panel(1)}
 
+      {winner !== null && open === null && (
+        <WinnerDialog
+          winnerName={state.teams[winner].name}
+          scores={[totalScore(state, 0), totalScore(state, 1)]}
+          teamNames={[state.teams[0].name, state.teams[1].name]}
+          onUndo={() => dispatch({ type: 'undoRound' })}
+          onNewGame={() => dispatch({ type: 'newGame' })}
+        />
+      )}
       {open?.kind === 'meld' && (
         <MeldDialog
           teamName={state.teams[open.team].name}

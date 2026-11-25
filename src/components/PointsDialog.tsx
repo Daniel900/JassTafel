@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { type GameState, type TeamIndex, previewRound } from '../domain/game';
-import { MATCH_POINTS, validateEnteredPoints } from '../domain/scoring';
+import { MATCH_POINTS, ROUND_TOTAL, validateEnteredPoints } from '../domain/scoring';
 import { Dialog } from './Dialog';
 
 interface Props {
@@ -39,26 +39,33 @@ export function PointsDialog({ state, team, rotated, onConfirm, onClose }: Props
 
   return (
     <Dialog title={`Punkte – ${state.teams[team].name}`} onClose={onClose} rotated={rotated}>
-      <div className="points-display" aria-live="polite" data-testid="points-input">
-        {input || '0'}
+      <div className="points-row">
+        <div className="points-display" aria-live="polite" data-testid="points-input">
+          {input || '0'}
+        </div>
+        <button
+          type="button"
+          className={`match-btn${value === MATCH_POINTS ? ' active' : ''}`}
+          onClick={() => setInput(String(MATCH_POINTS))}
+          aria-label="Match"
+        >
+          Match
+          <small>{MATCH_POINTS}</small>
+        </button>
       </div>
       <p className={`hint${validation && !validation.ok ? ' error' : ''}`}>
-        {validation && !validation.ok ? validation.error : `Kartenpunkte 0–157 (157 oder ${MATCH_POINTS} = Match)`}
+        {validation && !validation.ok ? validation.error : `Kartenpunkte 0–${ROUND_TOTAL} – alle Stiche: «Match» (${MATCH_POINTS})`}
       </p>
       <div className="preview">
         {row(team)}
         {row(other)}
       </div>
-      {preview?.melds.tie && <p className="hint error">Gleich hohe Weis – keiner wird gezählt.</p>}
       <div className="keypad">
         {KEYS.map((k) => (
           <button key={k} type="button" className="key" onClick={() => press(k)} aria-label={k === '⌫' ? 'Löschen' : k}>
             {k}
           </button>
         ))}
-        <button type="button" className="key key--wide" onClick={() => setInput(String(MATCH_POINTS))}>
-          Match (257)
-        </button>
       </div>
       <button type="button" className="primary-btn" disabled={!valid} onClick={() => valid && onConfirm(value!)}>
         Bestätigen

@@ -19,6 +19,17 @@ describe('storage', () => {
     expect(loadGame()).toEqual(createGame());
   });
 
+  it('migrates saved games without Trumpf team', () => {
+    const g = gameReducer(createGame(), { type: 'confirmRound', team: 0, points: 80 });
+    const old = JSON.parse(JSON.stringify(g));
+    delete old.trumpTeam;
+    delete old.history[0].trumpTeam;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(old));
+    const loaded = loadGame();
+    expect(loaded.trumpTeam).toBe(1);
+    expect(loaded.history[0].trumpTeam).toBe(0);
+  });
+
   it('does not throw if storage is unavailable', () => {
     const broken = {
       getItem: () => {

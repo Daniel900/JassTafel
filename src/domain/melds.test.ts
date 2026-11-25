@@ -42,9 +42,18 @@ describe('melds', () => {
 
   it('determines the winning team by its highest single meld', () => {
     // Team 0: two Dreiblatt (40 total), team 1: one Vierblatt (50) → team 1 wins
-    expect(meldWinner([[seq('dreiblatt', 'herz', 'A'), seq('dreiblatt', 'pik', 'A')], [seq('vierblatt', 'karo', '10')]], null)).toBe(1);
-    expect(meldWinner([[], []], null)).toBeNull();
-    expect(meldWinner([[simple('steck')], []], null)).toBeNull();
+    expect(meldWinner([[seq('dreiblatt', 'herz', 'A'), seq('dreiblatt', 'pik', 'A')], [seq('vierblatt', 'karo', '10')]], null, 0)).toBe(1);
+    expect(meldWinner([[], []], null, 0)).toBeNull();
+    expect(meldWinner([[simple('steck')], []], null, 0)).toBeNull();
+  });
+
+  it('gives exactly equal melds to the team with Trumpf', () => {
+    const melds: [Meld[], Meld[]] = [[seq('dreiblatt', 'herz', 'A')], [seq('dreiblatt', 'pik', 'A')]];
+    expect(meldWinner(melds, null, 1)).toBe(1);
+    expect(meldWinner(melds, 'karo', 0)).toBe(0);
+    // a sequence in the trump suit still beats the trump team
+    expect(meldWinner(melds, 'pik', 0)).toBe(1);
+    expect(evaluateMelds(melds, [80, 77], null, 1).points).toEqual([0, 20]);
   });
 
   it('counts all melds of the winning team only', () => {
@@ -54,23 +63,28 @@ describe('melds', () => {
       null,
     );
     expect(result.points).toEqual([70, 0]);
-    expect(result.winner).toBe(0);
+    expect(result.counted).toBe(0);
   });
 
-  it('does not count melds if the team made no point', () => {
-    const result = evaluateMelds([[seq('vierblatt', 'herz', 'A')], [seq('dreiblatt', 'karo', 'A')]], [0, 257], null);
+  it('gives the melds to the other team if the highest team made no point', () => {
+    const result = evaluateMelds(
+      [[seq('vierblatt', 'herz', 'A')], [seq('dreiblatt', 'karo', 'A'), seq('dreiblatt', 'pik', 'K')]],
+      [0, 157],
+      null,
+    );
+    expect(result.points).toEqual([0, 40]);
+    expect(result.counted).toBe(1);
+  });
+
+  it('counts no melds if the highest team made no point and the other has none', () => {
+    const result = evaluateMelds([[seq('vierblatt', 'herz', 'A')], []], [0, 257], null);
     expect(result.points).toEqual([0, 0]);
+    expect(result.counted).toBeNull();
   });
 
   it('always counts Steck, even without points and for the losing team', () => {
     const result = evaluateMelds([[simple('steck')], [seq('vierblatt', 'karo', 'A')]], [0, 257], 'kreuz');
     expect(result.points).toEqual([20, 50]);
-  });
-
-  it('reports an undecidable tie', () => {
-    const result = evaluateMelds([[seq('dreiblatt', 'herz', 'A')], [seq('dreiblatt', 'pik', 'A')]], [80, 77], null);
-    expect(result.tie).toBe(true);
-    expect(result.points).toEqual([0, 0]);
   });
 
   it('describes melds', () => {

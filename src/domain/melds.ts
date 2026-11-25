@@ -162,12 +162,14 @@ export function highestMeld(melds: Meld[], trump: Suit | null): Meld | null {
 }
 
 export type MeldWinner = 0 | 1 | null;
+type TeamIndex = 0 | 1;
 
 /**
- * Determines which team's melds are counted (the team with the highest single meld).
- * Returns null if nobody melded or the highest melds are exactly equal.
+ * Determines which team has the highest single meld.
+ * Exactly equal melds are won by the team that has Trumpf (chose trump this round).
+ * Returns null only if no team announced a competing meld.
  */
-export function meldWinner(melds: [Meld[], Meld[]], trump: Suit | null): MeldWinner {
+export function meldWinner(melds: [Meld[], Meld[]], trump: Suit | null, trumpTeam: TeamIndex): MeldWinner {
   const best0 = highestMeld(melds[0], trump);
   const best1 = highestMeld(melds[1], trump);
   if (!best0 && !best1) return null;
@@ -176,42 +178,44 @@ export function meldWinner(melds: [Meld[], Meld[]], trump: Suit | null): MeldWin
   const cmp = compareMelds(best0, best1, trump);
   if (cmp > 0) return 0;
   if (cmp < 0) return 1;
-  return null;
+  return trumpTeam;
 }
 
 export interface MeldResult {
   /** Meld points counted per team. */
   points: [number, number];
-  /** Team whose competing melds won (null = none). */
-  winner: MeldWinner;
-  /** True if both teams had equally high melds that could not be decided. */
-  tie: boolean;
+  /** Team whose competing melds are counted (null = none). */
+  counted: MeldWinner;
 }
 
 /**
  * Calculates the meld points of a round.
- * - Only the team with the highest single meld gets its (competing) melds counted,
- *   and only if that team made at least one card point.
+ * - The team with the highest single meld gets all its (competing) melds counted,
+ *   if it made at least one card point.
+ * - If that team made no card point, the other team gets its melds counted instead
+ *   (if it has any and made at least one card point).
  * - Steck always counts, also if the team made no points.
  */
 export function evaluateMelds(
   melds: [Meld[], Meld[]],
   cardPointsByTeam: [number, number],
   trump: Suit | null,
+  trumpTeam: TeamIndex = 0,
 ): MeldResult {
-  const winner = meldWinner(melds, trump);
-  const hasCompeting = melds.some((list) => list.some(isCompetingMeld));
+  const winner = meldWinner(melds, trump, trumpTeam);
+  let counted: MeldWinner = null;
+  if (winner !== null) {
+    const loser: TeamIndex = winner === 0 ? 1 : 0;
+    if (cardPointsByTeam[winner] > 0) counted = winner;
+    else if (cardPointsByTeam[loser] > 0 && melds[loser].some(isCompetingMeld)) counted = loser;
+  }
   const points: [number, number] = [0, 0];
   for (const team of [0, 1] as const) {
     for (const meld of melds[team]) {
-      if (!isCompetingMeld(meld)) {
-        points[team] += meldPoints(meld);
-      } else if (winner === team && cardPointsByTeam[team] > 0) {
-        points[team] += meldPoints(meld);
-      }
+      if (!isCompetingMeld(meld) || counted === team) points[team] += meldPoints(meld);
     }
   }
-  return { points, winner, tie: hasCompeting && winner === null };
+  return { points, counted };
 }
 
 export function describeMeld(meld: Meld): string {

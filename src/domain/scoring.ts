@@ -24,17 +24,15 @@ export function validateEnteredPoints(value: number): PointsValidation {
 
 /**
  * Splits the round points between the two teams.
- * 157 or 257 entered → own team gets 257 (Match), other team 0.
- * 0 entered → other team made a Match and gets 257.
+ * 257 entered (Match preset) → own team gets 257, other team 0.
+ * Any other value 0–157 → the other team gets the rest of 157
+ * (e.g. 157 / 0 is possible if the other team only won tricks without points).
  */
 export function splitRoundPoints(entered: number): RoundPoints {
   const validation = validateEnteredPoints(entered);
   if (!validation.ok) throw new Error(validation.error);
-  if (entered === ROUND_TOTAL || entered === MATCH_POINTS) {
+  if (entered === MATCH_POINTS) {
     return { own: MATCH_POINTS, other: 0 };
-  }
-  if (entered === 0) {
-    return { own: 0, other: MATCH_POINTS };
   }
   return { own: entered, other: ROUND_TOTAL - entered };
 }

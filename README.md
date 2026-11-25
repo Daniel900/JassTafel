@@ -9,7 +9,9 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 - Split screen: each team has its own half. By default the top half is rotated 180° so the phone can lie between the teams (you can turn this off in the menu).
 - **Melden** with card images: choose the meld type, then choose the highest card (also shown as an image) if the meld needs one.
 - **Punkte**: one team enters its card points and the other team's points are calculated automatically. Melds are added according to the rules when the round is confirmed.
-- Round counter, optional trump selection (used to break ties between melds), history, undo of the last round, team names and "Neues Spiel".
+- **Trumpf indicator**: shows which team has Trumpf. It switches sides after every round, and you can tap it to correct it. You can also select the trump suit.
+- **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.
+- Round counter, history, undo of the last round, team names and "Neues Spiel".
 
 ## Rules (as implemented)
 
@@ -26,8 +28,8 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 | Ass    | 11     | 11    |
 
 The cards add up to 152 points, and the last trick adds 5, so a round is worth **157** points.
-If you enter 157 or 257, the round counts as a **Match** and that team gets **257** points while the other team gets 0.
-If you enter 0, the other team gets the Match.
+The other team's points are always 157 minus the entered value, so 157 : 0 is possible if the other team only won tricks without points.
+If one team won **all tricks**, tap the **Match** preset next to the input field to give that team **257** points; the other team gets 0.
 
 **Melden**
 
@@ -42,8 +44,12 @@ If you enter 0, the other team gets the Match.
 | Steck (D+K trump)     | 20     | –              |
 
 - Only the team with the **highest single meld** gets its melds counted (all of them), and only if that team made at least one card point.
-- Melds are compared by points first. When the points are equal, Fünfblatt beats Vierling. After that, the higher card wins. If the cards are also equal, a sequence in the trump suit wins (if a trump suit is selected). If two melds are still exactly equal, neither team's melds count.
+- If that team made **no** card point, the **other team** gets its melds counted instead (if it has any).
+- Melds are compared by points first. When the points are equal, Fünfblatt beats Vierling. After that, the higher card wins. If the cards are also equal, a sequence in the trump suit wins (if a trump suit is selected). If two melds are still exactly equal, the **team with Trumpf** wins.
 - **Steck** always counts, even if the team made no points.
+- Sequences longer than five cards are not handled.
+
+**End of game:** the first team to reach **1000** points wins. If both teams pass 1000 in the same round, the higher total wins; on an exact tie, the team with Trumpf in that round wins.
 
 The rules are in `src/domain/` (`cards.ts`, `scoring.ts`, `melds.ts`, `game.ts`). The game has a `mode` field (`'schieber'`), so a future **Steiger** can reuse the same rules.
 

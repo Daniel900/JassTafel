@@ -240,7 +240,6 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
   font-size: 1.4rem;
   font-weight: 600;
 }
-.key--wide { grid-column: 1 / -1; font-size: 1.05rem; }
 
 .menu-actions { display: flex; flex-direction: column; gap: 10px; }
 .toggle { display: flex; align-items: center; gap: 10px; }
@@ -249,3 +248,42 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 .history th, .history td { padding: 6px; text-align: right; border-bottom: 1px solid rgba(100, 116, 139, 0.25); }
 .history th:first-child, .history td:first-child { text-align: left; }
 .history__meld { color: #16a34a; font-weight: 600; }
+
+.team__head { display: flex; align-items: center; gap: 10px; }
+.team__remaining { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.trump-badge {
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1.5px dashed rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+}
+.trump-badge.active {
+  border: 1.5px solid var(--accent);
+  background: var(--accent);
+  color: #1f2937;
+}
+.team .primary-btn:disabled, .team .secondary-btn:disabled { opacity: 0.35; }
+
+.points-row { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.points-display { min-width: 4ch; }
+.match-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-weight: 700;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: inherit;
+}
+.match-btn small { font-weight: 500; color: var(--surface-muted); }
+.match-btn.active { background: var(--accent); color: #1f2937; }
+.match-btn.active small { color: #1f2937; }
+
+.winner { text-align: center; }
+.winner__trophy { font-size: 3.5rem; }
+.winner__title { margin: 0; font-size: 1.6rem; }

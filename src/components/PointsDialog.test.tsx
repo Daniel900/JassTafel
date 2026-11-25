@@ -30,13 +30,16 @@ describe('PointsDialog', () => {
     expect(onConfirm).toHaveBeenCalledWith(97);
   });
 
-  it('shows a Match as 257', async () => {
+  it('keeps 157 as 157 and uses the Match preset for 257', async () => {
     const { user } = setup(1);
     await type(user, '157');
-    expect(screen.getByTestId('preview-cards-1')).toHaveTextContent('257');
+    expect(screen.getByTestId('preview-cards-1')).toHaveTextContent('157');
     expect(screen.getByTestId('preview-cards-0')).toHaveTextContent('0');
     // team 0 made no point → its melds do not count
     expect(screen.getByTestId('preview-melds-0')).toHaveTextContent('');
+    await user.click(screen.getByRole('button', { name: 'Match' }));
+    expect(screen.getByTestId('points-input')).toHaveTextContent('257');
+    expect(screen.getByTestId('preview-cards-1')).toHaveTextContent('257');
   });
 
   it('disables confirm for invalid values', async () => {
@@ -53,7 +56,7 @@ describe('PointsDialog', () => {
     expect(screen.getByTestId('points-input')).toHaveTextContent('1');
     await user.click(screen.getByRole('button', { name: 'C' }));
     expect(screen.getByTestId('points-input')).toHaveTextContent('0');
-    await user.click(screen.getByRole('button', { name: 'Match (257)' }));
+    await user.click(screen.getByRole('button', { name: 'Match' }));
     await user.click(screen.getByRole('button', { name: 'Bestätigen' }));
     expect(onConfirm).toHaveBeenCalledWith(257);
   });

@@ -16,12 +16,21 @@ function isGameState(value: unknown): value is GameState {
   );
 }
 
+/** Fills in fields added after the first release so older saved games still load. */
+function migrate(state: GameState): GameState {
+  return {
+    ...state,
+    trumpTeam: state.trumpTeam ?? (((state.round - 1) % 2) as 0 | 1),
+    history: state.history.map((r, i) => ({ ...r, trumpTeam: r.trumpTeam ?? ((i % 2) as 0 | 1) })),
+  };
+}
+
 export function loadGame(storage: Storage = localStorage): GameState {
   try {
     const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return createGame();
     const parsed: unknown = JSON.parse(raw);
-    return isGameState(parsed) ? parsed : createGame();
+    return isGameState(parsed) ? migrate(parsed) : createGame();
   } catch {
     return createGame();
   }

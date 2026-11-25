@@ -6,13 +6,13 @@ describe('scoring', () => {
     expect(splitRoundPoints(1)).toEqual({ own: 1, other: 156 });
   });
 
-  it('turns 157 and 257 into a Match with 257 points', () => {
-    expect(splitRoundPoints(157)).toEqual({ own: 257, other: 0 });
+  it('only turns 257 (Match preset) into a Match', () => {
     expect(splitRoundPoints(257)).toEqual({ own: 257, other: 0 });
   });
 
-  it('gives the other team a Match if 0 is entered', () => {
-    expect(splitRoundPoints(0)).toEqual({ own: 0, other: 257 });
+  it('keeps 157 / 0 as normal points (other team won only tricks without points)', () => {
+    expect(splitRoundPoints(157)).toEqual({ own: 157, other: 0 });
+    expect(splitRoundPoints(0)).toEqual({ own: 0, other: 157 });
   });
 
   it('rejects invalid values', () => {

@@ -1,3 +1,4 @@
+import { SUIT_SYMBOLS, type Suit } from '../domain/cards';
 import type { Meld } from '../domain/melds';
 import { describeMeld, meldPoints } from '../domain/melds';
 
@@ -7,20 +8,56 @@ interface Props {
   total: number;
   melds: Meld[];
   rotated?: boolean;
+  /** Remaining points until the target score. */
+  remaining: number;
+  hasTrump: boolean;
+  trump: Suit | null;
+  disabled?: boolean;
+  onTakeTrump: () => void;
   onMeld: () => void;
   onPoints: () => void;
   onRemoveMeld: (id: string) => void;
   onRename: () => void;
 }
 
-export function TeamPanel({ index, name, total, melds, rotated, onMeld, onPoints, onRemoveMeld, onRename }: Props) {
+export function TeamPanel({
+  index,
+  name,
+  total,
+  melds,
+  rotated,
+  remaining,
+  hasTrump,
+  trump,
+  disabled,
+  onTakeTrump,
+  onMeld,
+  onPoints,
+  onRemoveMeld,
+  onRename,
+}: Props) {
   return (
     <section className={`team team--${index}${rotated ? ' rotated' : ''}`} aria-label={name} data-testid={`team-${index}`}>
-      <button type="button" className="team__name" onClick={onRename}>
-        {name}
-      </button>
+      <div className="team__head">
+        <button type="button" className="team__name" onClick={onRename}>
+          {name}
+        </button>
+        <button
+          type="button"
+          className={`trump-badge${hasTrump ? ' active' : ''}`}
+          onClick={onTakeTrump}
+          aria-pressed={hasTrump}
+          data-testid={`trump-badge-${index}`}
+          aria-label={hasTrump ? 'Hat Trumpf' : 'Trumpf übernehmen'}
+        >
+          {hasTrump ? `Trumpf${trump ? ` ${SUIT_SYMBOLS[trump]}` : ''}` : 'Trumpf?'}
+        </button>
+      </div>
       <div className="team__total" data-testid={`total-${index}`}>
         {total}
+      </div>
+      <div className="team__remaining" data-testid={`remaining-${index}`}>
+        {remaining > 0 ? `noch ${remaining}` : 'Ziel erreicht'}
       </div>
       <ul className="team__melds" aria-label="Weis dieser Runde">
         {melds.map((m) => (
@@ -35,10 +72,10 @@ export function TeamPanel({ index, name, total, melds, rotated, onMeld, onPoints
         ))}
       </ul>
       <div className="team__actions">
-        <button type="button" className="secondary-btn" onClick={onMeld}>
+        <button type="button" className="secondary-btn" onClick={onMeld} disabled={disabled}>
           Melden
         </button>
-        <button type="button" className="primary-btn" onClick={onPoints}>
+        <button type="button" className="primary-btn" onClick={onPoints} disabled={disabled}>
           Punkte
         </button>
       </div>

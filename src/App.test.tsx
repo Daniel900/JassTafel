@@ -44,11 +44,37 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
-    await enter(user, '157');
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Match' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bestätigen' }));
     expect(screen.getByTestId('total-1')).toHaveTextContent('257');
     await user.click(screen.getByRole('button', { name: 'Menü' }));
     await user.click(screen.getByRole('button', { name: 'Letzte Runde rückgängig' }));
     await user.click(screen.getByRole('button', { name: 'Schliessen' }));
+    expect(screen.getByTestId('total-1')).toHaveTextContent('0');
+    expect(screen.getByTestId('round')).toHaveTextContent('Runde 1');
+  });
+
+  it('moves the Trumpf indicator to the other team after each round', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(screen.getByTestId('trump-badge-0')).toHaveAttribute('aria-pressed', 'true');
+    await user.click(within(screen.getByTestId('team-0')).getByRole('button', { name: 'Punkte' }));
+    await enter(user, '80');
+    expect(screen.getByTestId('trump-badge-1')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('trump-badge-0')).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('shows the winner at 1000 points and allows a new game', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    for (let i = 0; i < 4; i++) {
+      await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Match' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bestätigen' }));
+    }
+    const dialog = screen.getByRole('dialog', { name: 'Spielende' });
+    expect(within(dialog).getByText('Team 2 gewinnt!')).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Neues Spiel' }));
     expect(screen.getByTestId('total-1')).toHaveTextContent('0');
     expect(screen.getByTestId('round')).toHaveTextContent('Runde 1');
   });
