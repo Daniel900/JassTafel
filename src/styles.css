@@ -15,7 +15,7 @@
   --card-red: #c81e1e;
   --card-black: #111827;
   /* Lines and text of the black outline mode (OLED protection) */
-  --idle-fg: #b0b0b0;
+  --idle-fg: #ffffff;
   color-scheme: light;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }

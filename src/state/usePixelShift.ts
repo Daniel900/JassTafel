@@ -12,7 +12,10 @@ export const PIXEL_SHIFT_STEPS: ReadonlyArray<readonly [number, number]> = [
   [2, 2],
 ];
 
-export const PIXEL_SHIFT_INTERVAL_MS = 120_000;
+export const PIXEL_SHIFT_INTERVAL_MS = 60_000;
+
+/** The outline mode runs longest with the brightest lines, so it moves twice as far (up to 6 px). */
+export const IDLE_SHIFT_FACTOR = 2;
 
 /** Returns the current [x, y] offset; moves to the next step every `intervalMs`. */
 export function usePixelShift(intervalMs = PIXEL_SHIFT_INTERVAL_MS): readonly [number, number] {

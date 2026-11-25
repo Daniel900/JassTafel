@@ -8,7 +8,7 @@ import { WinnerDialog } from './components/WinnerDialog';
 import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore } from './domain/game';
 import { useGame } from './state/useGame';
 import { useIdle } from './state/useIdle';
-import { usePixelShift } from './state/usePixelShift';
+import { IDLE_SHIFT_FACTOR, usePixelShift } from './state/usePixelShift';
 import { useWakeLock } from './state/useWakeLock';
 
 const ROTATE_KEY = 'jasstafel.rotateTop';
@@ -31,7 +31,10 @@ export default function App() {
   const winner = gameWinner(state);
   // Black outline mode after 30 s without a tap (not while a dialog is open) – protects OLED screens.
   const idle = useIdle(undefined, open !== null || winner !== null);
-  const [shiftX, shiftY] = usePixelShift();
+  const [baseX, baseY] = usePixelShift();
+  const shiftFactor = idle ? IDLE_SHIFT_FACTOR : 1;
+  const shiftX = baseX * shiftFactor;
+  const shiftY = baseY * shiftFactor;
 
   const toggleRotate = () => {
     const next = !rotateTop;

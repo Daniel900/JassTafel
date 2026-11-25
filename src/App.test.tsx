@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
@@ -77,6 +77,33 @@ describe('App', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Neues Spiel' }));
     expect(screen.getByTestId('total-1')).toHaveTextContent('0');
     expect(screen.getByTestId('round')).toHaveTextContent('Runde 1');
+  });
+
+  it('switches to the black outline mode after 30 s and back on a tap, with buttons still working', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      render(<App />);
+      const tafel = screen.getByTestId('tafel');
+      expect(tafel).not.toHaveClass('tafel--idle');
+      act(() => vi.advanceTimersByTime(30_000));
+      expect(tafel).toHaveClass('tafel--idle');
+      // pixel shift is doubled in outline mode
+      act(() => vi.advanceTimersByTime(60_000));
+      expect(tafel.style.transform).toBe('translate(4px, 2px)');
+
+      // a tap on a button works directly and leaves the outline mode
+      await user.click(within(screen.getByTestId('team-0')).getByRole('button', { name: 'Punkte' }));
+      expect(tafel).not.toHaveClass('tafel--idle');
+      expect(tafel.style.transform).toBe('translate(2px, 1px)');
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      // no outline mode while a dialog is open
+      act(() => vi.advanceTimersByTime(60_000));
+      expect(tafel).not.toHaveClass('tafel--idle');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('renames a team', async () => {
