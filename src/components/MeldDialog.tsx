@@ -55,7 +55,7 @@ export function MeldDialog({ teamName, rotated, onAdd, onClose }: Props) {
       </button>
       {def.needs === 'highRank' ? (
         <>
-          <p className="hint">Bis zu welcher Karte? (Farbe egal)</p>
+          <p className="hint">Bis zu welcher Karte?</p>
           <div className="rank-picker">
             {possibleHighRanks(def.length!).map((rank) => (
               <button
