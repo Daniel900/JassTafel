@@ -1,4 +1,4 @@
-import { type Card, type Rank, type Suit, RANKS, RANK_NAMES, cardLabel, rankIndex } from './cards';
+import { type Card, type Rank, RANKS, RANK_NAMES, cardLabel, rankIndex } from './cards';
 
 export type MeldType =
   | 'dreiblatt'
@@ -136,29 +136,22 @@ function meldRankIndex(meld: Meld): number {
 
 /**
  * Compares two melds. Positive → a is higher, negative → b is higher, 0 → equal.
- * Order: points, then type priority (Fünfblatt > Vierling), then highest card,
- * then a sequence in the trump suit beats one in another suit.
+ * Order: points, then type priority (Fünfblatt > Vierling), then highest card.
+ * The suit never matters – equal melds are decided by the team with Trumpf.
  */
-export function compareMelds(a: Meld, b: Meld, trump: Suit | null): number {
+export function compareMelds(a: Meld, b: Meld): number {
   const defA = MELD_DEFINITIONS[a.type];
   const defB = MELD_DEFINITIONS[b.type];
   if (defA.points !== defB.points) return defA.points - defB.points;
   if (defA.priority !== defB.priority) return defA.priority - defB.priority;
-  const rankDiff = meldRankIndex(a) - meldRankIndex(b);
-  if (rankDiff !== 0) return rankDiff;
-  if (trump) {
-    const aTrump = a.highCard?.suit === trump ? 1 : 0;
-    const bTrump = b.highCard?.suit === trump ? 1 : 0;
-    return aTrump - bTrump;
-  }
-  return 0;
+  return meldRankIndex(a) - meldRankIndex(b);
 }
 
 /** Highest competing meld of a team, or null. */
-export function highestMeld(melds: Meld[], trump: Suit | null): Meld | null {
+export function highestMeld(melds: Meld[]): Meld | null {
   return melds
     .filter(isCompetingMeld)
-    .reduce<Meld | null>((best, m) => (best === null || compareMelds(m, best, trump) > 0 ? m : best), null);
+    .reduce<Meld | null>((best, m) => (best === null || compareMelds(m, best) > 0 ? m : best), null);
 }
 
 export type MeldWinner = 0 | 1 | null;
@@ -169,13 +162,13 @@ type TeamIndex = 0 | 1;
  * Exactly equal melds are won by the team that has Trumpf (chose trump this round).
  * Returns null only if no team announced a competing meld.
  */
-export function meldWinner(melds: [Meld[], Meld[]], trump: Suit | null, trumpTeam: TeamIndex): MeldWinner {
-  const best0 = highestMeld(melds[0], trump);
-  const best1 = highestMeld(melds[1], trump);
+export function meldWinner(melds: [Meld[], Meld[]], trumpTeam: TeamIndex): MeldWinner {
+  const best0 = highestMeld(melds[0]);
+  const best1 = highestMeld(melds[1]);
   if (!best0 && !best1) return null;
   if (!best1) return 0;
   if (!best0) return 1;
-  const cmp = compareMelds(best0, best1, trump);
+  const cmp = compareMelds(best0, best1);
   if (cmp > 0) return 0;
   if (cmp < 0) return 1;
   return trumpTeam;
@@ -199,10 +192,9 @@ export interface MeldResult {
 export function evaluateMelds(
   melds: [Meld[], Meld[]],
   cardPointsByTeam: [number, number],
-  trump: Suit | null,
   trumpTeam: TeamIndex = 0,
 ): MeldResult {
-  const winner = meldWinner(melds, trump, trumpTeam);
+  const winner = meldWinner(melds, trumpTeam);
   let counted: MeldWinner = null;
   if (winner !== null) {
     const loser: TeamIndex = winner === 0 ? 1 : 0;

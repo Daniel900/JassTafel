@@ -1,4 +1,3 @@
-import { SUIT_SYMBOLS, type Suit } from '../domain/cards';
 import type { Meld } from '../domain/melds';
 import { describeMeld, meldPoints } from '../domain/melds';
 
@@ -11,7 +10,6 @@ interface Props {
   /** Remaining points until the target score. */
   remaining: number;
   hasTrump: boolean;
-  trump: Suit | null;
   disabled?: boolean;
   onTakeTrump: () => void;
   onMeld: () => void;
@@ -28,7 +26,6 @@ export function TeamPanel({
   rotated,
   remaining,
   hasTrump,
-  trump,
   disabled,
   onTakeTrump,
   onMeld,
@@ -50,7 +47,7 @@ export function TeamPanel({
           data-testid={`trump-badge-${index}`}
           aria-label={hasTrump ? 'Hat Trumpf' : 'Trumpf übernehmen'}
         >
-          {hasTrump ? `Trumpf${trump ? ` ${SUIT_SYMBOLS[trump]}` : ''}` : 'Trumpf?'}
+          {hasTrump ? 'Trumpf' : 'Trumpf?'}
         </button>
       </div>
       <div className="team__total" data-testid={`total-${index}`}>

@@ -135,20 +135,6 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
   border-block: 2px solid rgba(255, 255, 255, 0.15);
 }
 .round { font-weight: 700; white-space: nowrap; }
-.trump { display: flex; gap: 4px; }
-.trump__btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--card-black);
-  font-size: 1.3rem;
-  line-height: 1;
-  opacity: 0.55;
-}
-.trump__btn.red { color: var(--card-red); }
-.trump__btn.active { opacity: 1; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
 
 .icon-btn {
   background: none;
@@ -287,3 +273,4 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 .winner { text-align: center; }
 .winner__trophy { font-size: 3.5rem; }
 .winner__title { margin: 0; font-size: 1.6rem; }
+.history__trump { color: var(--surface-muted); font-size: 0.8rem; }
