@@ -12,6 +12,7 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 - **Trumpf indicator**: shows which team has Trumpf (chose trump) this round. It switches sides after every round, and you can tap it to correct it. The trump suit itself isn't entered: you count the card points yourself, and only the team with Trumpf matters for the rules.
 - **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.
 - Round counter, history, undo of the last round, team names and "Neues Spiel".
+- **Screen stays on** while the app is open (Screen Wake Lock API). This needs HTTPS and a browser with support (Chrome/Android, Safari on iOS 16.4+; as a home-screen app on iOS 18.4+).
 
 ## Rules (as implemented)
 
