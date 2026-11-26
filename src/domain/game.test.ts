@@ -173,6 +173,20 @@ describe('win counter (Siege)', () => {
     expect(g.wins).toEqual([1, 2]);
   });
 
+  it('keeps Trumpf alternating into the next game', () => {
+    // 4 rounds: Trumpf 0, 1, 0, 1 → the next game starts with team 0's turn after team 1
+    let g = play(createGame(), 1, 257, 4);
+    expect(g.history[3].trumpTeam).toBe(1);
+    g = gameReducer(g, { type: 'nextGame' });
+    expect(g.trumpTeam).toBe(0);
+    // 3 rounds: Trumpf 0, 1, 0 → next game starts with team 1
+    g = play(g, 1, 257, 3);
+    g = play(g, 0, 100, 7); // team 0 can't reach 1000 here, team 1 wins at 771 + 7×57 = 1170
+    const last = g.history[g.history.length - 1].trumpTeam;
+    g = gameReducer(g, { type: 'nextGame' });
+    expect(g.trumpTeam).toBe(last === 0 ? 1 : 0);
+  });
+
   it('ignores "Nächstes Spiel" while the game is still running', () => {
     const g = play(createGame(), 0, 100, 2);
     expect(gameReducer(g, { type: 'nextGame' })).toBe(g);

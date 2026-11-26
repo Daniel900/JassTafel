@@ -135,7 +135,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const award = winAward(state);
       if (!award) return state;
       const wins = updateTeamList(state.wins, award.team, state.wins[award.team] + award.wins);
-      return { ...createGame([state.teams[0].name, state.teams[1].name]), wins };
+      // Trumpf keeps alternating: the team after the last round's Trumpf team starts the next game.
+      return { ...createGame([state.teams[0].name, state.teams[1].name]), wins, trumpTeam: state.trumpTeam };
     }
     case 'newGame':
       return createGame([state.teams[0].name, state.teams[1].name]);
