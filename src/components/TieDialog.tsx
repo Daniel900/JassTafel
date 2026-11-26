@@ -9,6 +9,8 @@ interface Props {
   melds: [Meld[], Meld[]];
   /** Rotate the top half (team 1) like the board. */
   rotateTop: boolean;
+  /** Opened from "Punkte": the points can only be entered after choosing. */
+  requiredForPoints?: boolean;
   onPick: (team: TeamIndex, rank: Rank) => void;
   onLater: () => void;
 }
@@ -17,7 +19,7 @@ interface Props {
  * Both teams have the same kind of Weis as their highest one: each team chooses its
  * highest card on its own half of the screen. Closes by itself once both have chosen.
  */
-export function TieDialog({ tie, teamNames, melds, rotateTop, onPick, onLater }: Props) {
+export function TieDialog({ tie, teamNames, melds, rotateTop, requiredForPoints, onPick, onLater }: Props) {
   const def = MELD_DEFINITIONS[tie.type];
   const question = def.needs === 'highRank' ? 'Bis zu welcher Karte?' : 'Welche Karte?';
 
@@ -44,9 +46,10 @@ export function TieDialog({ tie, teamNames, melds, rotateTop, onPick, onLater }:
       <div className="tie__bar">
         <span>
           Beide: <strong>{def.name}</strong> – höchste Karte wählen
+          {requiredForPoints && <span className="tie__required"> (vor den Punkten)</span>}
         </span>
         <button type="button" className="link-btn tie__later" onClick={onLater}>
-          Später
+          {requiredForPoints ? 'Zurück' : 'Später'}
         </button>
       </div>
       {half(1)}

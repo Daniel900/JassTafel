@@ -7,7 +7,7 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 ## Features
 
 - Split screen: each team has its own half. By default the top half is rotated 180° so the phone can lie between the teams (you can turn this off in the menu).
-- **Melden** with card images: one tap adds the Weis. The highest card is only asked when it matters: if both teams' highest Weis is of the same kind (e.g. both a Dreiblatt), a split screen appears and each team picks its highest card on its own half. It can be postponed with "Später" and reopened from the points screen.
+- **Melden** with card images: one tap adds the Weis. The highest card is only asked when it matters: if both teams' highest Weis is of the same kind (e.g. both a Dreiblatt), a split screen appears and each team picks its highest card on its own half. It can be postponed with "Später", but must be answered before the points are entered: tapping "Punkte" brings the question back first, and the points screen opens by itself once both teams have chosen.
 - **Punkte**: one team enters its card points and the other team's points are calculated automatically. Melds are added according to the rules when the round is confirmed.
 - **Trumpf indicator**: shows which team has Trumpf (chose trump) this round. It switches sides after every round, and you can tap it to correct it. The trump suit itself isn't entered: you count the card points yourself, and only the team with Trumpf matters for the rules.
 - **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.

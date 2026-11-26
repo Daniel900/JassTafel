@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CenterBar } from './components/CenterBar';
 import { MeldDialog } from './components/MeldDialog';
 import { MenuDialog } from './components/MenuDialog';
@@ -36,6 +36,22 @@ export default function App() {
   const tieKey = tie ? `${state.round}:${tie.type}` : null;
   const [postponedTie, setPostponedTie] = useState<string | null>(null);
   const showTie = tie !== null && open === null && winner === null && postponedTie !== tieKey;
+  // "Punkte" tapped while the highest card is still open: answer that first, then open the points screen.
+  const [pointsAfterTie, setPointsAfterTie] = useState<TeamIndex | null>(null);
+  useEffect(() => {
+    if (tie === null && pointsAfterTie !== null) {
+      setOpen({ kind: 'points', team: pointsAfterTie });
+      setPointsAfterTie(null);
+    }
+  }, [tie, pointsAfterTie]);
+  const openPoints = (team: TeamIndex) => {
+    if (tie) {
+      setPostponedTie(null);
+      setPointsAfterTie(team);
+    } else {
+      setOpen({ kind: 'points', team });
+    }
+  };
   // Black outline mode after 30 s without a tap (not while a dialog is open) – protects OLED screens.
   const idle = useIdle(undefined, open !== null || winner !== null || showTie);
   const [baseX, baseY] = usePixelShift();
@@ -74,7 +90,7 @@ export default function App() {
             disabled={winner !== null}
       onTakeTrump={() => dispatch({ type: 'setTrumpTeam', team })}
       onMeld={() => setOpen({ kind: 'meld', team })}
-      onPoints={() => setOpen({ kind: 'points', team })}
+      onPoints={() => openPoints(team)}
       onRemoveMeld={(id) => dispatch({ type: 'removeMeld', team, id })}
       onRename={() => rename(team)}
     />
@@ -99,8 +115,12 @@ export default function App() {
           teamNames={[state.teams[0].name, state.teams[1].name]}
           melds={state.pendingMelds}
           rotateTop={rotateTop}
+          requiredForPoints={pointsAfterTie !== null}
           onPick={(team, rank) => dispatch({ type: 'setMeldRank', team, meldType: tie.type, rank })}
-          onLater={() => setPostponedTie(tieKey)}
+          onLater={() => {
+            setPostponedTie(tieKey);
+            setPointsAfterTie(null);
+          }}
         />
       )}
       {winner !== null && open === null && (
@@ -127,10 +147,6 @@ export default function App() {
           state={state}
           team={open.team}
           rotated={isRotated(open.team)}
-          onResolveTie={() => {
-            setPostponedTie(null);
-            setOpen(null);
-          }}
           onConfirm={(points) => {
             dispatch({ type: 'confirmRound', team: open.team, points });
             setOpen(null);

@@ -66,7 +66,7 @@ describe('App', () => {
     expect(screen.getByTestId('total-1')).toHaveTextContent('97'); // 77 + 20
   });
 
-  it('can postpone the card question and open it again from the points screen', async () => {
+  it('a postponed card question must be answered before the points can be entered', async () => {
     const user = userEvent.setup();
     render(<App />);
     for (const team of [0, 1] as const) {
@@ -76,10 +76,22 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: 'Später' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
+    // "Punkte" brings the question back first …
     await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
-    expect(screen.getByTestId('tie-hint')).toHaveTextContent('Beide haben Vierling');
-    await user.click(screen.getByRole('button', { name: 'Jetzt wählen' }));
-    expect(screen.getByRole('dialog', { name: 'Gleicher Weis' })).toBeInTheDocument();
+    const tie = screen.getByRole('dialog', { name: 'Gleicher Weis' });
+    expect(tie).toHaveTextContent('(vor den Punkten)');
+    expect(screen.queryByRole('dialog', { name: /Punkte/ })).not.toBeInTheDocument();
+
+    // … "Zurück" cancels both …
+    await user.click(within(tie).getByRole('button', { name: 'Zurück' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // … and after both teams have chosen, the points screen of the tapping team opens by itself
+    await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
+    await user.click(within(screen.getByTestId('tie-0')).getByRole('button', { name: 'Vierling Ass' }));
+    await user.click(within(screen.getByTestId('tie-1')).getByRole('button', { name: 'Vierling König' }));
+    expect(screen.queryByRole('dialog', { name: 'Gleicher Weis' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Punkte – Team 2' })).toBeInTheDocument();
   });
 
   it('undoes the last round from the menu', async () => {

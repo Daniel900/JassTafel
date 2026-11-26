@@ -349,3 +349,4 @@ body:has(.tafel--idle) { background: #000; }
 .rank-option { padding: 8px 4px; gap: 4px; border-color: rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.92); color: var(--surface-text, #0f172a); }
 .rank-option .meld-option__name { font-size: 0.85rem; color: #0f172a; }
 .rank-option.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+.tie__required { color: var(--accent); }

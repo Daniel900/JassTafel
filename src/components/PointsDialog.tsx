@@ -9,14 +9,12 @@ interface Props {
   team: TeamIndex;
   rotated?: boolean;
   onConfirm: (points: number) => void;
-  /** Open the "highest card" screen for a postponed tie between equal Weis. */
-  onResolveTie?: () => void;
   onClose: () => void;
 }
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'];
 
-export function PointsDialog({ state, team, rotated, onConfirm, onClose, onResolveTie }: Props) {
+export function PointsDialog({ state, team, rotated, onConfirm, onClose }: Props) {
   const tie = findMeldTie(state.pendingMelds);
   const [input, setInput] = useState('');
   const value = input === '' ? null : Number(input);
@@ -66,13 +64,7 @@ export function PointsDialog({ state, team, rotated, onConfirm, onClose, onResol
       </div>
       {tie && (
         <p className="hint error" data-testid="tie-hint">
-          Beide haben {MELD_DEFINITIONS[tie.type].name}: höchste Karte noch nicht gewählt (sonst gewinnt das
-          Trumpf-Team).{' '}
-          {onResolveTie && (
-            <button type="button" className="link-btn" onClick={onResolveTie}>
-              Jetzt wählen
-            </button>
-          )}
+          Beide haben {MELD_DEFINITIONS[tie.type].name}: zuerst die höchste Karte wählen.
         </p>
       )}
       <div className="keypad">
@@ -82,7 +74,12 @@ export function PointsDialog({ state, team, rotated, onConfirm, onClose, onResol
           </button>
         ))}
       </div>
-      <button type="button" className="primary-btn" disabled={!valid} onClick={() => valid && onConfirm(value!)}>
+      <button
+        type="button"
+        className="primary-btn"
+        disabled={!valid || tie !== null}
+        onClick={() => valid && !tie && onConfirm(value!)}
+      >
         Bestätigen
       </button>
     </Dialog>
