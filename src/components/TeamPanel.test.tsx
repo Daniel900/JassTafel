@@ -11,6 +11,7 @@ describe('TeamPanel', () => {
         name="Hirsche"
         total={412}
         remaining={588}
+        wins={3}
         hasTrump
         melds={[{ id: 's', type: 'steck' }]}
         rotated
@@ -30,6 +31,7 @@ describe('TeamPanel', () => {
     expect(handlers.onRemoveMeld).toHaveBeenCalledWith('s');
     expect(handlers.onRename).toHaveBeenCalled();
     expect(screen.getByTestId('remaining-0')).toHaveTextContent('noch 588');
+    expect(screen.getByTestId('wins-0')).toHaveTextContent('3 Siege');
     expect(screen.getByTestId('trump-badge-0')).toHaveTextContent('Trumpf');
   });
 
@@ -41,6 +43,7 @@ describe('TeamPanel', () => {
         name="Gäste"
         total={1000}
         remaining={0}
+        wins={1}
         hasTrump={false}
         melds={[]}
         disabled
@@ -54,6 +57,7 @@ describe('TeamPanel', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Trumpf übernehmen' }));
     expect(onTakeTrump).toHaveBeenCalled();
     expect(screen.getByTestId('remaining-1')).toHaveTextContent('Ziel erreicht');
+    expect(screen.getByTestId('wins-1')).toHaveTextContent('1 Sieg');
     expect(screen.getByRole('button', { name: 'Punkte' })).toBeDisabled();
   });
 });

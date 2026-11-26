@@ -11,7 +11,10 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 - **Punkte**: one team enters its card points and the other team's points are calculated automatically. Melds are added according to the rules when the round is confirmed.
 - **Trumpf indicator**: shows which team has Trumpf (chose trump) this round. It switches sides after every round, and you can tap it to correct it. The trump suit itself isn't entered: you count the card points yourself, and only the team with Trumpf matters for the rules.
 - **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.
-- Round counter, history, undo of the last round, team names and "Neues Spiel".
+- **Win counter ("Siege")** per team for the whole Jass evening. The winner of a game gets 1 win, or **2 wins** if the other team has fewer than 500 points.
+  - End screen **"Nächstes Spiel"**: books the win and starts the next game. The win counter is kept.
+  - Menu **"Neuer Jass-Abend"**: starts completely fresh. Points and win counter are reset.
+- Round counter, history, undo of the last round and team names.
 - **Screen stays on** while the app is open (Screen Wake Lock API). This needs HTTPS and a browser with support (Chrome/Android, Safari on iOS 16.4+; as a home-screen app on iOS 18.4+).
 - **OLED protection**: after 30 s without a tap (and no dialog open) the board switches to a black outline mode (black background, thin white lines and text). All buttons keep working, and any tap brings the colours back. The whole board also shifts by a few pixels every minute (±3 px, ±6 px in outline mode). The outline colour is the CSS variable `--idle-fg` in `src/styles.css`.
 

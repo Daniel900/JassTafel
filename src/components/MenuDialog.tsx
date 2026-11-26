@@ -13,7 +13,7 @@ interface Props {
 
 export function MenuDialog({ state, rotateTop, onToggleRotate, onUndo, onNewGame, onClose }: Props) {
   const confirmNewGame = () => {
-    if (window.confirm('Neues Spiel starten? Alle Punkte werden gelöscht.')) {
+    if (window.confirm('Neuen Jass-Abend starten? Punkte und gewonnene Spiele werden gelöscht.')) {
       onNewGame();
       onClose();
     }
@@ -25,7 +25,7 @@ export function MenuDialog({ state, rotateTop, onToggleRotate, onUndo, onNewGame
           Letzte Runde rückgängig
         </button>
         <button type="button" className="secondary-btn" onClick={confirmNewGame}>
-          Neues Spiel
+          Neuer Jass-Abend
         </button>
         <label className="toggle">
           <input type="checkbox" checked={rotateTop} onChange={onToggleRotate} />

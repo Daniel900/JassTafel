@@ -5,7 +5,7 @@ import { MenuDialog } from './components/MenuDialog';
 import { PointsDialog } from './components/PointsDialog';
 import { TeamPanel } from './components/TeamPanel';
 import { WinnerDialog } from './components/WinnerDialog';
-import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore } from './domain/game';
+import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore, totalWins, winAward } from './domain/game';
 import { useGame } from './state/useGame';
 import { useIdle } from './state/useIdle';
 import { IDLE_SHIFT_FACTOR, usePixelShift } from './state/usePixelShift';
@@ -60,6 +60,7 @@ export default function App() {
       name={state.teams[team].name}
       total={totalScore(state, team)}
       remaining={Math.max(0, TARGET_SCORE - totalScore(state, team))}
+      wins={totalWins(state, team)}
       melds={state.pendingMelds[team]}
       rotated={isRotated(team)}
       hasTrump={state.trumpTeam === team}
@@ -90,8 +91,10 @@ export default function App() {
           winnerName={state.teams[winner].name}
           scores={[totalScore(state, 0), totalScore(state, 1)]}
           teamNames={[state.teams[0].name, state.teams[1].name]}
+          wins={[totalWins(state, 0), totalWins(state, 1)]}
+          award={winAward(state)!.wins}
           onUndo={() => dispatch({ type: 'undoRound' })}
-          onNewGame={() => dispatch({ type: 'newGame' })}
+          onNextGame={() => dispatch({ type: 'nextGame' })}
         />
       )}
       {open?.kind === 'meld' && (

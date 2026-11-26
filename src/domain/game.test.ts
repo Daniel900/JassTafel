@@ -1,4 +1,15 @@
-import { TARGET_SCORE, createGame, gameReducer, gameWinner, previewRound, totalScore } from './game';
+import {
+  DOUBLE_WIN_THRESHOLD,
+  type GameState,
+  TARGET_SCORE,
+  createGame,
+  gameReducer,
+  gameWinner,
+  previewRound,
+  totalScore,
+  totalWins,
+  winAward,
+} from './game';
 import type { Meld } from './melds';
 
 const dreiblatt: Meld = { id: 'a', type: 'dreiblatt', rank: 'A' };
@@ -108,5 +119,76 @@ describe('game', () => {
     g = gameReducer(g, { type: 'newGame' });
     expect(g.history).toHaveLength(0);
     expect(g.teams[1].name).toBe('Gäste');
+  });
+});
+
+/** Plays rounds where `team` enters `points` each time. */
+const play = (g: GameState, team: 0 | 1, points: number, times: number) => {
+  for (let i = 0; i < times; i++) g = gameReducer(g, { type: 'confirmRound', team, points });
+  return g;
+};
+
+describe('win counter (Siege)', () => {
+  it('gives 2 wins if the losing team has fewer than 500 points', () => {
+    expect(DOUBLE_WIN_THRESHOLD).toBe(500);
+    const g = play(createGame(), 1, 257, 4); // 1028 : 0
+    expect(winAward(g)).toEqual({ team: 1, wins: 2 });
+    expect(totalWins(g, 1)).toBe(2);
+    expect(totalWins(g, 0)).toBe(0);
+  });
+
+  it('gives 1 win if the losing team has 500 points or more', () => {
+    // team 0 enters 100 each round → 100 : 57 per round
+    let g = play(createGame(), 0, 100, 9); // 900 : 513
+    expect(winAward(g)).toBeNull();
+    g = play(g, 0, 100, 1); // 1000 : 570
+    expect(winAward(g)).toEqual({ team: 0, wins: 1 });
+  });
+
+  it('uses exactly 500 as single win (only below 500 counts double)', () => {
+    const round = (cards: [number, number]) => ({
+      number: 1,
+      cardPoints: cards,
+      meldPoints: [0, 0] as [number, number],
+      melds: [[], []] as [never[], never[]],
+      enteredBy: 0 as const,
+      trumpTeam: 0 as const,
+    });
+    expect(winAward({ ...createGame(), history: [round([1000, 500])] })).toEqual({ team: 0, wins: 1 });
+    expect(winAward({ ...createGame(), history: [round([1000, 499])] })).toEqual({ team: 0, wins: 2 });
+  });
+
+  it('"Nächstes Spiel" books the win, keeps the counter and names, resets the game', () => {
+    let g = gameReducer(createGame(), { type: 'renameTeam', team: 0, name: 'Hirsche' });
+    g = play(g, 1, 257, 4);
+    g = gameReducer(g, { type: 'nextGame' });
+    expect(g.wins).toEqual([0, 2]);
+    expect(g.history).toHaveLength(0);
+    expect(g.round).toBe(1);
+    expect(g.teams[0].name).toBe('Hirsche');
+    expect(totalWins(g, 1)).toBe(2);
+    // second game, team 0 wins against a team with more than 500
+    g = play(g, 0, 100, 10);
+    g = gameReducer(g, { type: 'nextGame' });
+    expect(g.wins).toEqual([1, 2]);
+  });
+
+  it('ignores "Nächstes Spiel" while the game is still running', () => {
+    const g = play(createGame(), 0, 100, 2);
+    expect(gameReducer(g, { type: 'nextGame' })).toBe(g);
+  });
+
+  it('undoing the winning round also removes the not yet booked win', () => {
+    let g = play(createGame(), 1, 257, 4);
+    expect(totalWins(g, 1)).toBe(2);
+    g = gameReducer(g, { type: 'undoRound' });
+    expect(totalWins(g, 1)).toBe(0);
+  });
+
+  it('"Neuer Jass-Abend" (newGame) resets the win counter', () => {
+    let g = gameReducer(play(createGame(), 1, 257, 4), { type: 'nextGame' });
+    expect(g.wins).toEqual([0, 2]);
+    g = gameReducer(g, { type: 'newGame' });
+    expect(g.wins).toEqual([0, 0]);
   });
 });
