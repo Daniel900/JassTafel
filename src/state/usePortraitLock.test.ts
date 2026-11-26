@@ -1,4 +1,4 @@
-import { portraitLockStyle } from './usePortraitLock';
+import { iosStandaloneFrameStyle, portraitLockStyle } from './usePortraitLock';
 
 describe('portraitLockStyle', () => {
   it('does nothing in portrait', () => {
@@ -22,5 +22,23 @@ describe('portraitLockStyle', () => {
       expect(style).toMatchObject({ width: '390px', height: '844px', transform: 'rotate(90deg) translateY(-100%)' });
       expect(style).toMatchObject({ '--inset-top': 'env(safe-area-inset-right)' });
     }
+  });
+});
+
+describe('portraitLockStyle in the iPhone home-screen app', () => {
+  it('uses the real screen size for the rotated board', () => {
+    expect(portraitLockStyle(844, 380, 90, { width: 390, height: 844 })).toMatchObject({ width: '390px', height: '844px' });
+  });
+});
+
+describe('iosStandaloneFrameStyle', () => {
+  it('uses the real screen height in the iPhone home-screen app (status bar bug)', () => {
+    // iOS reports 793 instead of 852 (status bar missing) – the frame still covers the whole screen
+    expect(iosStandaloneFrameStyle(393, 793, 852, true)).toMatchObject({ top: 0, height: '852px', width: '100%' });
+  });
+
+  it('does nothing in the browser, on Android or in landscape', () => {
+    expect(iosStandaloneFrameStyle(393, 700, 852, false)).toBeNull();
+    expect(iosStandaloneFrameStyle(852, 393, 852, true)).toBeNull();
   });
 });

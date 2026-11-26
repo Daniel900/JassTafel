@@ -9,15 +9,21 @@ export const PORTRAIT_LOCK_MAX_SHORT_SIDE = 600;
  * exactly where it was relative to the phone. `angle` is the screen orientation angle
  * (90 = turned counter-clockwise, 270 = turned clockwise). Returns null when no rotation is needed.
  */
-export function portraitLockStyle(width: number, height: number, angle: number): CSSProperties | null {
+export function portraitLockStyle(
+  width: number,
+  height: number,
+  angle: number,
+  /** Real portrait screen size (iPhone home-screen app), used instead of the reported size. */
+  portraitScreen?: { width: number; height: number },
+): CSSProperties | null {
   const landscape = width > height;
   if (!landscape || Math.min(width, height) >= PORTRAIT_LOCK_MAX_SHORT_SIDE) return null;
   const base: CSSProperties = {
     position: 'fixed',
     top: 0,
     left: 0,
-    width: `${height}px`,
-    height: `${width}px`,
+    width: `${portraitScreen?.width ?? height}px`,
+    height: `${portraitScreen?.height ?? width}px`,
     transformOrigin: 'top left',
   };
   // The safe areas (notch, home indicator) of the landscape screen are mapped onto the rotated board.
@@ -36,6 +42,25 @@ export function portraitLockStyle(width: number, height: number, angle: number):
   return { ...base, ...insets('left', 'top', 'right', 'bottom'), transform: 'rotate(-90deg) translateX(-100%)' };
 }
 
+/**
+ * iPhone home-screen app (standalone) in portrait: iOS sometimes reports the visible height
+ * without the status bar while the page still starts under it, so the board ended one
+ * status-bar height above the bottom edge. In a home-screen app the page always covers the
+ * whole screen, so the frame simply gets the real screen height. Returns null elsewhere.
+ */
+export function iosStandaloneFrameStyle(
+  innerWidth: number,
+  innerHeight: number,
+  screenHeight: number,
+  iosStandalone: boolean,
+): CSSProperties | null {
+  if (!iosStandalone || innerWidth > innerHeight || !screenHeight) return null;
+  return { position: 'fixed', top: 0, left: 0, width: '100%', height: `${screenHeight}px` };
+}
+
+/** `navigator.standalone` exists only on iOS and is true for apps started from the home screen. */
+const isIosStandalone = () => (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
 function currentAngle(): number {
   const so = typeof screen !== 'undefined' ? screen.orientation : undefined;
   if (so && typeof so.angle === 'number') return so.angle;
@@ -49,7 +74,15 @@ function currentAngle(): number {
  * is allowed (Android home-screen app), and otherwise rotates the layout back (iPhone).
  */
 export function usePortraitLock(): CSSProperties | null {
-  const compute = () => portraitLockStyle(window.innerWidth, window.innerHeight, currentAngle());
+  const compute = () =>
+    portraitLockStyle(
+      window.innerWidth,
+      window.innerHeight,
+      currentAngle(),
+      // iOS reports screen.width/height in portrait orientation, also when the phone is turned
+      isIosStandalone() ? { width: Math.min(screen.width, screen.height), height: Math.max(screen.width, screen.height) } : undefined,
+    ) ??
+    iosStandaloneFrameStyle(window.innerWidth, window.innerHeight, screen.height, isIosStandalone());
   const [style, setStyle] = useState<CSSProperties | null>(compute);
 
   useEffect(() => {
