@@ -52,14 +52,14 @@ describe('App', () => {
 
     // second team melds the same kind → split screen appears
     await meld(1, 'Dreiblatt');
-    const tie = screen.getByRole('dialog', { name: 'Gleicher Weis' });
+    const tie = screen.getByRole('dialog', { name: 'Gleiche Meldung' });
     await user.click(within(within(tie).getByTestId('tie-0')).getByRole('button', { name: 'Dreiblatt bis König' }));
-    expect(screen.getByRole('dialog', { name: 'Gleicher Weis' })).toBeInTheDocument(); // team 2 still open
+    expect(screen.getByRole('dialog', { name: 'Gleiche Meldung' })).toBeInTheDocument(); // team 2 still open
     await user.click(within(within(tie).getByTestId('tie-1')).getByRole('button', { name: 'Dreiblatt bis Ass' }));
-    expect(screen.queryByRole('dialog', { name: 'Gleicher Weis' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Gleiche Meldung' })).not.toBeInTheDocument();
     expect(within(screen.getByTestId('team-1')).getByText(/Dreiblatt bis Ass/)).toBeInTheDocument();
 
-    // Team 2 has the higher Dreiblatt → only Team 2's Weis counts (Team 1 has Trumpf, but Ass > König)
+    // Team 2 has the higher Dreiblatt → only Team 2's meld counts (Team 1 has Trumpf, but Ass > König)
     await user.click(within(screen.getByTestId('team-0')).getByRole('button', { name: 'Punkte' }));
     await enter(user, '80');
     expect(screen.getByTestId('total-0')).toHaveTextContent('80');
@@ -78,7 +78,7 @@ describe('App', () => {
 
     // "Punkte" brings the question back first …
     await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
-    const tie = screen.getByRole('dialog', { name: 'Gleicher Weis' });
+    const tie = screen.getByRole('dialog', { name: 'Gleiche Meldung' });
     expect(tie).toHaveTextContent('(vor den Punkten)');
     expect(screen.queryByRole('dialog', { name: /Punkte/ })).not.toBeInTheDocument();
 
@@ -90,7 +90,7 @@ describe('App', () => {
     await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
     await user.click(within(screen.getByTestId('tie-0')).getByRole('button', { name: 'Vierling Ass' }));
     await user.click(within(screen.getByTestId('tie-1')).getByRole('button', { name: 'Vierling König' }));
-    expect(screen.queryByRole('dialog', { name: 'Gleicher Weis' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Gleiche Meldung' })).not.toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Punkte – Team 2' })).toBeInTheDocument();
   });
 

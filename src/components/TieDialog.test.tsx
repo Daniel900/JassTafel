@@ -18,7 +18,7 @@ describe('TieDialog', () => {
       type: 'dreiblatt',
       missing: [true, true],
     });
-    expect(screen.getByRole('dialog', { name: 'Gleicher Weis' })).toHaveTextContent('Beide: Dreiblatt');
+    expect(screen.getByRole('dialog', { name: 'Gleiche Meldung' })).toHaveTextContent('Beide: Dreiblatt');
     const top = screen.getByTestId('tie-0');
     const bottom = screen.getByTestId('tie-1');
     expect(top).toHaveClass('rotated');

@@ -46,7 +46,7 @@ export function RulesDialog({ onClose }: Props) {
               <strong>Andere Farben:</strong> Ass, König, Dame, Bauer, 10, 9, 8, 7
             </li>
           </ul>
-          <p>Für Weis-Folgen gilt die natürliche Reihenfolge: 7, 8, 9, 10, Bauer, Dame, König, Ass.</p>
+          <p>Für Folgen beim Melden gilt die natürliche Reihenfolge: 7, 8, 9, 10, Bauer, Dame, König, Ass.</p>
         </Section>
 
         <Section title="3. Trumpf">
@@ -132,11 +132,11 @@ export function RulesDialog({ onClose }: Props) {
           </p>
         </Section>
 
-        <Section title="6. Weisen (Melden)">
+        <Section title="6. Melden">
           <table className="rules__table">
             <thead>
               <tr>
-                <th>Weis</th>
+                <th>Meldung</th>
                 <th>Punkte</th>
               </tr>
             </thead>
@@ -172,9 +172,9 @@ export function RulesDialog({ onClose }: Props) {
             </tbody>
           </table>
           <p>
-            <strong>Welches Team bekommt den Weis?</strong> Nur das Team mit dem <strong>höchsten einzelnen Weis</strong>{' '}
-            erhält seine Weis-Punkte – dann aber <em>alle</em> seine Weise. Das andere Team erhält für seine Weise
-            nichts.
+            <strong>Welches Team bekommt die Meldepunkte?</strong> Nur das Team mit der{' '}
+            <strong>höchsten einzelnen Meldung</strong> erhält Meldepunkte – dann aber für <em>alle</em> seine
+            Meldungen. Das andere Team erhält für seine Meldungen nichts.
           </p>
           <p>
             <strong>Was ist höher?</strong>
@@ -187,16 +187,16 @@ export function RulesDialog({ onClose }: Props) {
               höchste Karte der Folge, beim Vierling die Karte selbst. Die Farbe spielt keine Rolle.
             </li>
             <li>
-              Sind beide Weise genau gleich hoch, gewinnt das <strong>Team, das den Trumpf hat</strong>.
+              Sind beide Meldungen genau gleich hoch, gewinnt das <strong>Team, das den Trumpf hat</strong>.
             </li>
           </ol>
           <p>
-            <strong>Mindestens ein Punkt:</strong> Weis-Punkte zählen nur, wenn das Team in dieser Runde mindestens
-            einen Kartenpunkt gemacht hat. Hat das Team mit dem höchsten Weis keinen Punkt gemacht, erhält stattdessen
-            das andere Team seine Weis-Punkte.
+            <strong>Mindestens ein Punkt:</strong> Meldepunkte zählen nur, wenn das Team in dieser Runde mindestens
+            einen Kartenpunkt gemacht hat. Hat das Team mit der höchsten Meldung keinen Punkt gemacht, erhält
+            stattdessen das andere Team seine Meldepunkte.
           </p>
           <p>
-            <strong>Steck</strong> zählt immer – unabhängig vom höchsten Weis und auch dann, wenn das Team keinen Punkt
+            <strong>Steck</strong> zählt immer – unabhängig von der höchsten Meldung und auch dann, wenn das Team keinen Punkt
             gemacht hat.
           </p>
         </Section>
@@ -217,16 +217,16 @@ export function RulesDialog({ onClose }: Props) {
           <ul>
             <li>
               <strong>Melden:</strong> Während der Runde tippt jedes Team auf seiner Hälfte auf «Melden» und wählt den
-              Weis – ein Tipp genügt. Falsch gemeldet? Mit dem ✕ am Weis wieder entfernen.
+              Meldung – ein Tipp genügt. Falsch gemeldet? Mit dem ✕ an der Meldung wieder entfernen.
             </li>
             <li>
-              <strong>Höchste Karte:</strong> Haben beide Teams als höchsten Weis die gleiche Art (z. B. beide einen
+              <strong>Höchste Karte:</strong> Haben beide Teams als höchste Meldung die gleiche Art (z. B. beide einen
               Dreiblatt), erscheint ein geteilter Bildschirm: Jedes Team wählt auf seiner Seite seine höchste Karte. Mit
               «Später» kann man das verschieben, vor dem Eintragen der Punkte muss es aber gewählt sein.
             </li>
             <li>
               <strong>Punkte:</strong> Nach der Runde zählt ein Team seine Kartenpunkte und tippt sie unter «Punkte»
-              ein. Die Punkte des anderen Teams ({ROUND_TOTAL} minus eure Punkte) und die Weis-Punkte werden
+              ein. Die Punkte des anderen Teams ({ROUND_TOTAL} minus eure Punkte) und die Meldepunkte werden
               automatisch berechnet und angezeigt. Bei allen Stichen: «Match» ({MATCH_POINTS}). Mit «Bestätigen» wird
               alles eingetragen und die nächste Runde beginnt.
             </li>

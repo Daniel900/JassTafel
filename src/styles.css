@@ -311,7 +311,7 @@ body:has(.tafel--idle) { background: #000; }
 .winner__award { margin: 0; font-weight: 700; color: #16a34a; }
 .preview__head { color: var(--surface-muted); font-size: 0.8rem; }
 
-/* ---- Same kind of Weis for both teams: each team picks its highest card on its half ---- */
+/* ---- Same kind of meld for both teams: each team picks its highest card on its half ---- */
 .tie {
   position: fixed;
   inset: 0;

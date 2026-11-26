@@ -32,7 +32,7 @@ export default function App() {
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
   const winner = gameWinner(state);
-  // Both teams have the same kind of Weis → ask for the highest card (unless postponed with "Später").
+  // Both teams have the same kind of meld → ask for the highest card (unless postponed with "Später").
   const tie = findMeldTie(state.pendingMelds);
   const tieKey = tie ? `${state.round}:${tie.type}` : null;
   const [postponedTie, setPostponedTie] = useState<string | null>(null);

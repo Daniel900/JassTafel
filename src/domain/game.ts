@@ -56,7 +56,7 @@ export type GameAction =
   | { type: 'addMeld'; team: TeamIndex; meld: Meld }
   | { type: 'removeMeld'; team: TeamIndex; id: string }
   | { type: 'setTrumpTeam'; team: TeamIndex }
-  /** Tie between equal Weis: the team's highest card for that kind of Weis. */
+  /** Tie between equal melds: the team's highest card for that kind of meld. */
   | { type: 'setMeldRank'; team: TeamIndex; meldType: MeldType; rank: Rank }
   | { type: 'confirmRound'; team: TeamIndex; points: number }
   | { type: 'undoRound' }
@@ -105,7 +105,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const list = state.pendingMelds[action.team];
       const index = list.findIndex((m) => m.type === action.meldType);
       if (index < 0) return state;
-      // The card is stored on one Weis of that kind; the others of the same kind keep no card.
+      // The card is stored on one meld of that kind; the others of the same kind keep no card.
       const updated = list.map((m, i) =>
         m.type !== action.meldType ? m : i === index ? { ...m, rank: action.rank } : { id: m.id, type: m.type },
       );

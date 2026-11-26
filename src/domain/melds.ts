@@ -14,7 +14,7 @@ export interface Meld {
   type: MeldType;
   /**
    * Highest card of a sequence (Dreiblatt/Vierblatt/Fünfblatt) or the card of a Vierling.
-   * Only asked when both teams have the same kind of Weis as their highest one
+   * Only asked when both teams have the same kind of meld as their highest one
    * (see `findMeldTie`). The suit is not needed – it never matters for the rules.
    */
   rank?: Rank;
@@ -162,14 +162,14 @@ export type MeldWinner = 0 | 1 | null;
 type TeamIndex = 0 | 1;
 
 export interface MeldTie {
-  /** The kind of Weis both teams have as their highest one. */
+  /** The kind of meld both teams have as their highest one. */
   type: MeldType;
   /** Per team: true if its highest card for this kind has not been chosen yet. */
   missing: [boolean, boolean];
 }
 
 /**
- * The highest card only matters if both teams' highest Weis is of the same kind
+ * The highest card only matters if both teams' highest meld is of the same kind
  * (e.g. both a Dreiblatt). Returns that kind while a team still has to choose its
  * highest card, otherwise null.
  */

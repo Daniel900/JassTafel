@@ -11,7 +11,7 @@ describe('RulesDialog', () => {
       '3. Trumpf',
       '4. Spielablauf',
       '5. Kartenpunkte',
-      '6. Weisen (Melden)',
+      '6. Melden',
       '7. Spielende & Siege',
       '8. So bedient ihr die Tafel',
     ]) {
@@ -28,7 +28,7 @@ describe('RulesDialog', () => {
     expect(text).toContain('257');
     expect(text).toContain('1000 Punkte');
     expect(text).toContain('weniger als 500 Punkte');
-    expect(text).toContain('höchsten einzelnen Weis');
+    expect(text).toContain('höchsten einzelnen Meldung');
     expect(text).toContain('Team, das den Trumpf hat');
     for (const meld of ['Dreiblatt', 'Vierblatt', 'Fünfblatt', 'Vierling', 'Vier Nell', 'Vier Buur', 'Steck']) {
       expect(text).toContain(meld);

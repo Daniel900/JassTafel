@@ -37,7 +37,7 @@ describe('game', () => {
     expect(g.pendingMelds[0]).toHaveLength(1);
   });
 
-  it('sets the highest card of a tie on one Weis of that kind', () => {
+  it('sets the highest card of a tie on one meld of that kind', () => {
     let g = createGame();
     g = gameReducer(g, { type: 'addMeld', team: 0, meld: { id: 'a', type: 'dreiblatt' } });
     g = gameReducer(g, { type: 'addMeld', team: 0, meld: { id: 'b', type: 'dreiblatt' } });

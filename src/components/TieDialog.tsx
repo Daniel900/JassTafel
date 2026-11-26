@@ -16,7 +16,7 @@ interface Props {
 }
 
 /**
- * Both teams have the same kind of Weis as their highest one: each team chooses its
+ * Both teams have the same kind of meld (Meldung) as their highest one: each team chooses its
  * highest card on its own half of the screen. Closes by itself once both have chosen.
  */
 export function TieDialog({ tie, teamNames, melds, rotateTop, requiredForPoints, onPick, onLater }: Props) {
@@ -41,7 +41,7 @@ export function TieDialog({ tie, teamNames, melds, rotateTop, requiredForPoints,
   };
 
   return (
-    <div className="tie" role="dialog" aria-modal="true" aria-label="Gleicher Weis">
+    <div className="tie" role="dialog" aria-modal="true" aria-label="Gleiche Meldung">
       {half(0)}
       <div className="tie__bar">
         <span>
