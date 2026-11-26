@@ -13,6 +13,7 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 - **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.
 - Round counter, history, undo of the last round, team names and "Neues Spiel".
 - **Screen stays on** while the app is open (Screen Wake Lock API). This needs HTTPS and a browser with support (Chrome/Android, Safari on iOS 16.4+; as a home-screen app on iOS 18.4+).
+- **OLED protection**: after 30 s without a tap (and no dialog open) the board switches to a black outline mode (black background, thin white lines and text). All buttons keep working, and any tap brings the colours back. The whole board also shifts by a few pixels every minute (±3 px, ±6 px in outline mode). The outline colour is the CSS variable `--idle-fg` in `src/styles.css`.
 
 ## Rules (as implemented)
 
