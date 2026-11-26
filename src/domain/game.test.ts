@@ -30,9 +30,30 @@ describe('game', () => {
     expect(g.pendingMelds[0]).toHaveLength(0);
   });
 
-  it('ignores invalid melds', () => {
-    const g = gameReducer(createGame(), { type: 'addMeld', team: 0, meld: { id: 'x', type: 'dreiblatt' } });
-    expect(g.pendingMelds[0]).toHaveLength(0);
+  it('accepts melds without a card but ignores melds with an impossible card', () => {
+    let g = gameReducer(createGame(), { type: 'addMeld', team: 0, meld: { id: 'x', type: 'dreiblatt' } });
+    expect(g.pendingMelds[0]).toHaveLength(1);
+    g = gameReducer(g, { type: 'addMeld', team: 0, meld: { id: 'y', type: 'dreiblatt', rank: '8' } });
+    expect(g.pendingMelds[0]).toHaveLength(1);
+  });
+
+  it('sets the highest card of a tie on one Weis of that kind', () => {
+    let g = createGame();
+    g = gameReducer(g, { type: 'addMeld', team: 0, meld: { id: 'a', type: 'dreiblatt' } });
+    g = gameReducer(g, { type: 'addMeld', team: 0, meld: { id: 'b', type: 'dreiblatt' } });
+    g = gameReducer(g, { type: 'addMeld', team: 0, meld: { id: 's', type: 'steck' } });
+    g = gameReducer(g, { type: 'setMeldRank', team: 0, meldType: 'dreiblatt', rank: 'K' });
+    expect(g.pendingMelds[0]).toEqual([
+      { id: 'a', type: 'dreiblatt', rank: 'K' },
+      { id: 'b', type: 'dreiblatt' },
+      { id: 's', type: 'steck' },
+    ]);
+    // choosing again replaces the card
+    g = gameReducer(g, { type: 'setMeldRank', team: 0, meldType: 'dreiblatt', rank: 'A' });
+    expect(g.pendingMelds[0][0].rank).toBe('A');
+    // impossible card or a kind the team doesn't have → ignored
+    expect(gameReducer(g, { type: 'setMeldRank', team: 0, meldType: 'dreiblatt', rank: '7' })).toBe(g);
+    expect(gameReducer(g, { type: 'setMeldRank', team: 1, meldType: 'dreiblatt', rank: 'A' })).toBe(g);
   });
 
   it('confirms a round: other team auto-calculated, melds added, next round', () => {

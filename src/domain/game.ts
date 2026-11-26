@@ -1,4 +1,5 @@
-import { type Meld, type MeldResult, evaluateMelds, isValidMeld } from './melds';
+import type { Rank } from './cards';
+import { type Meld, type MeldResult, type MeldType, evaluateMelds, isValidMeld, possibleRanks } from './melds';
 import { splitRoundPoints } from './scoring';
 
 export type TeamIndex = 0 | 1;
@@ -55,6 +56,8 @@ export type GameAction =
   | { type: 'addMeld'; team: TeamIndex; meld: Meld }
   | { type: 'removeMeld'; team: TeamIndex; id: string }
   | { type: 'setTrumpTeam'; team: TeamIndex }
+  /** Tie between equal Weis: the team's highest card for that kind of Weis. */
+  | { type: 'setMeldRank'; team: TeamIndex; meldType: MeldType; rank: Rank }
   | { type: 'confirmRound'; team: TeamIndex; points: number }
   | { type: 'undoRound' }
   | { type: 'renameTeam'; team: TeamIndex; name: string }
@@ -97,6 +100,17 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case 'setTrumpTeam':
       return { ...state, trumpTeam: action.team };
+    case 'setMeldRank': {
+      if (!possibleRanks(action.meldType).includes(action.rank)) return state;
+      const list = state.pendingMelds[action.team];
+      const index = list.findIndex((m) => m.type === action.meldType);
+      if (index < 0) return state;
+      // The card is stored on one Weis of that kind; the others of the same kind keep no card.
+      const updated = list.map((m, i) =>
+        m.type !== action.meldType ? m : i === index ? { ...m, rank: action.rank } : { id: m.id, type: m.type },
+      );
+      return { ...state, pendingMelds: updateTeamList(state.pendingMelds, action.team, updated) };
+    }
     case 'confirmRound': {
       if (isGameOver(state)) return state;
       const { cardPoints, melds } = previewRound(state, action.team, action.points);

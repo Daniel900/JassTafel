@@ -60,4 +60,15 @@ describe('PointsDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Bestätigen' }));
     expect(onConfirm).toHaveBeenCalledWith(257);
   });
+
+  it('cannot confirm while both teams still have to choose their highest card', async () => {
+    let tied = gameReducer(createGame(), { type: 'addMeld', team: 0, meld: { id: 'a', type: 'dreiblatt' } });
+    tied = gameReducer(tied, { type: 'addMeld', team: 1, meld: { id: 'b', type: 'dreiblatt' } });
+    const onConfirm = vi.fn();
+    render(<PointsDialog state={tied} team={0} onConfirm={onConfirm} onClose={vi.fn()} />);
+    const user = userEvent.setup();
+    await type(user, '80');
+    expect(screen.getByTestId('tie-hint')).toHaveTextContent('zuerst die höchste Karte wählen');
+    expect(screen.getByRole('button', { name: 'Bestätigen' })).toBeDisabled();
+  });
 });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type GameState, type TeamIndex, previewRound } from '../domain/game';
+import { MELD_DEFINITIONS, findMeldTie } from '../domain/melds';
 import { MATCH_POINTS, ROUND_TOTAL, validateEnteredPoints } from '../domain/scoring';
 import { Dialog } from './Dialog';
 
@@ -14,6 +15,7 @@ interface Props {
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '⌫'];
 
 export function PointsDialog({ state, team, rotated, onConfirm, onClose }: Props) {
+  const tie = findMeldTie(state.pendingMelds);
   const [input, setInput] = useState('');
   const value = input === '' ? null : Number(input);
   const validation = value === null ? null : validateEnteredPoints(value);
@@ -60,6 +62,11 @@ export function PointsDialog({ state, team, rotated, onConfirm, onClose }: Props
         {row(team)}
         {row(other)}
       </div>
+      {tie && (
+        <p className="hint error" data-testid="tie-hint">
+          Beide haben {MELD_DEFINITIONS[tie.type].name}: zuerst die höchste Karte wählen.
+        </p>
+      )}
       <div className="keypad">
         {KEYS.map((k) => (
           <button key={k} type="button" className="key" onClick={() => press(k)} aria-label={k === '⌫' ? 'Löschen' : k}>
@@ -67,7 +74,12 @@ export function PointsDialog({ state, team, rotated, onConfirm, onClose }: Props
           </button>
         ))}
       </div>
-      <button type="button" className="primary-btn" disabled={!valid} onClick={() => valid && onConfirm(value!)}>
+      <button
+        type="button"
+        className="primary-btn"
+        disabled={!valid || tie !== null}
+        onClick={() => valid && !tie && onConfirm(value!)}
+      >
         Bestätigen
       </button>
     </Dialog>
