@@ -53,7 +53,8 @@ export function RulesDialog({ onClose }: Props) {
           <p>
             In jeder Runde bestimmt ein Team den Trumpf. Das wechselt nach jeder Runde zum anderen Team – auch über
             das Ende eines Spiels hinaus ins nächste Spiel. Wer am Zug ist, darf den Trumpf selbst wählen oder zum
-            Partner <strong>schieben</strong>, der dann wählen muss.
+            Partner <strong>schieben</strong>, der dann wählen muss. Beim Schieben dürfen keine Absprachen
+            stattfinden – weder Worte noch Zeichen über die eigenen Karten.
           </p>
           <p>
             Auf der Tafel zeigt das gelbe Feld <strong>«Trumpf»</strong>, welches Team diese Runde den Trumpf hat.

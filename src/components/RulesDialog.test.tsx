@@ -24,6 +24,7 @@ describe('RulesDialog', () => {
     const text = screen.getByRole('dialog').textContent ?? '';
     expect(text).toContain('Skat-Blatt');
     expect(text).toContain('Man muss immer die ausgespielte Farbe angeben');
+    expect(text).toContain('Beim Schieben dürfen keine Absprachen');
     expect(text).not.toContain('am Tisch fest');
     expect(text).toContain('5 Punkte für den letzten Stich');
     expect(text).toContain('157 Punkte');
