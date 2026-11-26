@@ -23,6 +23,8 @@ describe('RulesDialog', () => {
     render(<RulesDialog onClose={vi.fn()} />);
     const text = screen.getByRole('dialog').textContent ?? '';
     expect(text).toContain('Skat-Blatt');
+    expect(text).toContain('Man muss immer die ausgespielte Farbe angeben');
+    expect(text).not.toContain('am Tisch fest');
     expect(text).toContain('5 Punkte für den letzten Stich');
     expect(text).toContain('157 Punkte');
     expect(text).toContain('257');

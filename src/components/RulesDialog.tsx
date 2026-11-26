@@ -67,10 +67,10 @@ export function RulesDialog({ onClose }: Props) {
             Karte einer anderen Farbe). Wer den Stich gewinnt, spielt die nächste Karte aus. Nach 8 Stichen ist die
             Runde vorbei.
           </p>
-          <p className="rules__note">
-            Üblich beim Schieber: Farbe angeben, wer nicht angeben kann, darf trumpfen oder eine beliebige Karte
-            abwerfen; trumpfen ist jederzeit erlaubt. Solche Details zum Ausspielen legt ihr am Tisch fest – die
-            Tafel zählt nur die Punkte.
+          <p>
+            <strong>Farbe angeben:</strong> Man muss immer die ausgespielte Farbe angeben. Ausnahmen: Man hat diese
+            Farbe nicht – dann darf man eine beliebige Karte spielen – oder man spielt einen Trumpf. Ein Trumpf darf
+            also jederzeit gespielt werden.
           </p>
         </Section>
 
