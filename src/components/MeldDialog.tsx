@@ -14,7 +14,7 @@ const newId = () => `${Date.now().toString(36)}-${(idCounter++).toString(36)}`;
 
 /**
  * Choose what to meld – one tap adds it. The highest card is only asked later,
- * when both teams have the same kind of Weis (see TieDialog).
+ * when both teams have the same kind of meld (see TieDialog).
  */
 export function MeldDialog({ teamName, rotated, onAdd, onClose }: Props) {
   const add = (type: MeldType) => {

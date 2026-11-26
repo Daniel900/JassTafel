@@ -63,7 +63,7 @@ export function TeamPanel({
       <div className="team__wins" data-testid={`wins-${index}`}>
         {wins === 1 ? '1 Sieg' : `${wins} Siege`}
       </div>
-      <ul className="team__melds" aria-label="Weis dieser Runde">
+      <ul className="team__melds" aria-label="Meldungen dieser Runde">
         {melds.map((m) => (
           <li key={m.id} className="chip">
             <span>

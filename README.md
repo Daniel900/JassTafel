@@ -7,7 +7,7 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
 ## Features
 
 - Split screen: each team has its own half. By default the top half is rotated 180° so the phone can lie between the teams (you can turn this off in the menu).
-- **Melden** with card images: one tap adds the Weis. The highest card is only asked when it matters: if both teams' highest Weis is of the same kind (e.g. both a Dreiblatt), a split screen appears and each team picks its highest card on its own half. It can be postponed with "Später", but must be answered before the points are entered: tapping "Punkte" brings the question back first, and the points screen opens by itself once both teams have chosen.
+- **Melden** with card images: one tap adds the meld (Meldung). The highest card is only asked when it matters: if both teams' highest meld is of the same kind (e.g. both a Dreiblatt), a split screen appears and each team picks its highest card on its own half. It can be postponed with "Später", but must be answered before the points are entered: tapping "Punkte" brings the question back first, and the points screen opens by itself once both teams have chosen.
 - **Punkte**: one team enters its card points and the other team's points are calculated automatically. Melds are added according to the rules when the round is confirmed.
 - **Trumpf indicator**: shows which team has Trumpf (chose trump) this round. It switches sides after every round, and you can tap it to correct it. The trump suit itself isn't entered: you count the card points yourself, and only the team with Trumpf matters for the rules.
 - **Target 1000**: each side shows how many points are still missing. As soon as a team reaches 1000, the winner is shown.
@@ -15,6 +15,7 @@ The whole game state lives **only in the browser** (localStorage), so a page rel
   - End screen **"Nächstes Spiel"**: books the win and starts the next game. The win counter is kept, and Trumpf keeps alternating from the last round.
   - Menu **"Neuer Jass-Abend"**: starts completely fresh. Points and win counter are reset.
 - Round counter, history, undo of the last round and team names.
+- **Regeln & Anleitung** in the menu: the complete rules and how to use the Tafel, in German.
 - **Screen stays on** while the app is open (Screen Wake Lock API). This needs HTTPS and a browser with support (Chrome/Android, Safari on iOS 16.4+; as a home-screen app on iOS 18.4+).
 - **OLED protection**: after 30 s without a tap (and no dialog open) the board switches to a black outline mode (black background, thin white lines and text). All buttons keep working, and any tap brings the colours back. The whole board also shifts by a few pixels every minute (±3 px, ±6 px in outline mode). The outline colour is the CSS variable `--idle-fg` in `src/styles.css`.
 

@@ -8,10 +8,11 @@ interface Props {
   onToggleRotate: () => void;
   onUndo: () => void;
   onNewGame: () => void;
+  onShowRules: () => void;
   onClose: () => void;
 }
 
-export function MenuDialog({ state, rotateTop, onToggleRotate, onUndo, onNewGame, onClose }: Props) {
+export function MenuDialog({ state, rotateTop, onToggleRotate, onUndo, onNewGame, onShowRules, onClose }: Props) {
   const confirmNewGame = () => {
     if (window.confirm('Neuen Jass-Abend starten? Punkte und gewonnene Spiele werden gelöscht.')) {
       onNewGame();
@@ -26,6 +27,9 @@ export function MenuDialog({ state, rotateTop, onToggleRotate, onUndo, onNewGame
         </button>
         <button type="button" className="secondary-btn" onClick={confirmNewGame}>
           Neuer Jass-Abend
+        </button>
+        <button type="button" className="secondary-btn" onClick={onShowRules}>
+          Regeln & Anleitung
         </button>
         <label className="toggle">
           <input type="checkbox" checked={rotateTop} onChange={onToggleRotate} />

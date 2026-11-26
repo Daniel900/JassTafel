@@ -14,7 +14,7 @@ describe('melds', () => {
     expect(isValidMeld(seq('fuenfblatt', '10'))).toBe(false);
     expect(isValidMeld(vierling('9'))).toBe(false);
     expect(isValidMeld(vierling('A'))).toBe(true);
-    // the card is optional – only asked when both teams have the same kind of Weis
+    // the card is optional – only asked when both teams have the same kind of meld
     expect(isValidMeld({ id: 'x', type: 'dreiblatt' })).toBe(true);
     expect(isValidMeld({ id: 'x', type: 'vierling' })).toBe(true);
   });
@@ -22,15 +22,15 @@ describe('melds', () => {
   describe('findMeldTie (when is the highest card needed?)', () => {
     const plain = (type: Meld['type']): Meld => ({ id: String(n++), type });
 
-    it('asks nothing if the highest Weis are of different kinds', () => {
+    it('asks nothing if the highest melds are of different kinds', () => {
       expect(findMeldTie([[plain('vierblatt')], [plain('dreiblatt')]])).toBeNull();
       expect(findMeldTie([[plain('fuenfblatt')], [plain('vierling')]])).toBeNull();
       expect(findMeldTie([[plain('dreiblatt')], []])).toBeNull();
-      // a lower Weis of the same kind doesn't matter
+      // a lower meld of the same kind doesn't matter
       expect(findMeldTie([[plain('vierblatt'), plain('dreiblatt')], [plain('dreiblatt')]])).toBeNull();
     });
 
-    it('asks both teams if both have the same kind as highest Weis', () => {
+    it('asks both teams if both have the same kind as highest meld', () => {
       expect(findMeldTie([[plain('dreiblatt')], [plain('dreiblatt'), plain('steck')]])).toEqual({
         type: 'dreiblatt',
         missing: [true, true],
@@ -46,7 +46,7 @@ describe('melds', () => {
       expect(findMeldTie([[seq('dreiblatt', 'A')], [seq('dreiblatt', 'K')]])).toBeNull();
     });
 
-    it('never asks for Weis without a card (Vier Nell, Vier Buur, Steck)', () => {
+    it('never asks for melds without a card (Vier Nell, Vier Buur, Steck)', () => {
       expect(findMeldTie([[plain('steck')], [plain('steck')]])).toBeNull();
       expect(findMeldTie([[plain('vierBuur')], [plain('vierBuur')]])).toBeNull();
     });

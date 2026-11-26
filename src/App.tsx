@@ -4,6 +4,7 @@ import { MeldDialog } from './components/MeldDialog';
 import { MenuDialog } from './components/MenuDialog';
 import { PointsDialog } from './components/PointsDialog';
 import { TeamPanel } from './components/TeamPanel';
+import { RulesDialog } from './components/RulesDialog';
 import { TieDialog } from './components/TieDialog';
 import { WinnerDialog } from './components/WinnerDialog';
 import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore, totalWins, winAward } from './domain/game';
@@ -23,7 +24,7 @@ function readRotate(): boolean {
   }
 }
 
-type Open = { kind: 'meld' | 'points'; team: TeamIndex } | { kind: 'menu' } | null;
+type Open = { kind: 'meld' | 'points'; team: TeamIndex } | { kind: 'menu' } | { kind: 'rules' } | null;
 
 export default function App() {
   const [state, dispatch] = useGame();
@@ -31,7 +32,7 @@ export default function App() {
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
   const winner = gameWinner(state);
-  // Both teams have the same kind of Weis → ask for the highest card (unless postponed with "Später").
+  // Both teams have the same kind of meld → ask for the highest card (unless postponed with "Später").
   const tie = findMeldTie(state.pendingMelds);
   const tieKey = tie ? `${state.round}:${tie.type}` : null;
   const [postponedTie, setPostponedTie] = useState<string | null>(null);
@@ -161,9 +162,11 @@ export default function App() {
           onToggleRotate={toggleRotate}
           onUndo={() => dispatch({ type: 'undoRound' })}
           onNewGame={() => dispatch({ type: 'newGame' })}
+          onShowRules={() => setOpen({ kind: 'rules' })}
           onClose={() => setOpen(null)}
         />
       )}
+      {open?.kind === 'rules' && <RulesDialog onClose={() => setOpen({ kind: 'menu' })} />}
     </main>
   );
 }
