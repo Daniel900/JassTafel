@@ -12,6 +12,7 @@ import { findMeldTie } from './domain/melds';
 import { useGame } from './state/useGame';
 import { useIdle } from './state/useIdle';
 import { IDLE_SHIFT_FACTOR, usePixelShift } from './state/usePixelShift';
+import { usePortraitLock } from './state/usePortraitLock';
 import { useWakeLock } from './state/useWakeLock';
 
 const ROTATE_KEY = 'jasstafel.rotateTop';
@@ -29,6 +30,7 @@ type Open = { kind: 'meld' | 'points'; team: TeamIndex } | { kind: 'menu' } | { 
 export default function App() {
   const [state, dispatch] = useGame();
   useWakeLock();
+  const portraitLock = usePortraitLock();
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
   const winner = gameWinner(state);
@@ -98,75 +100,77 @@ export default function App() {
   );
 
   return (
-    <main
-      className={`tafel${idle ? ' tafel--idle' : ''}`}
-      data-testid="tafel"
-      style={{ transform: `translate(${shiftX}px, ${shiftY}px)` }}
-    >
-      {panel(0)}
-      <CenterBar
-        round={state.round}
-        onMenu={() => setOpen({ kind: 'menu' })}
-      />
-      {panel(1)}
+    <div className="app-frame" data-testid="app-frame" style={portraitLock ?? undefined}>
+      <main
+        className={`tafel${idle ? ' tafel--idle' : ''}`}
+        data-testid="tafel"
+        style={{ transform: `translate(${shiftX}px, ${shiftY}px)` }}
+      >
+        {panel(0)}
+        <CenterBar
+          round={state.round}
+          onMenu={() => setOpen({ kind: 'menu' })}
+        />
+        {panel(1)}
 
-      {showTie && tie && (
-        <TieDialog
-          tie={tie}
-          teamNames={[state.teams[0].name, state.teams[1].name]}
-          melds={state.pendingMelds}
-          rotateTop={rotateTop}
-          requiredForPoints={pointsAfterTie !== null}
-          onPick={(team, rank) => dispatch({ type: 'setMeldRank', team, meldType: tie.type, rank })}
-          onLater={() => {
-            setPostponedTie(tieKey);
-            setPointsAfterTie(null);
-          }}
-        />
-      )}
-      {winner !== null && open === null && (
-        <WinnerDialog
-          winnerName={state.teams[winner].name}
-          scores={[totalScore(state, 0), totalScore(state, 1)]}
-          teamNames={[state.teams[0].name, state.teams[1].name]}
-          wins={[totalWins(state, 0), totalWins(state, 1)]}
-          award={winAward(state)!.wins}
-          onUndo={() => dispatch({ type: 'undoRound' })}
-          onNextGame={() => dispatch({ type: 'nextGame' })}
-        />
-      )}
-      {open?.kind === 'meld' && (
-        <MeldDialog
-          teamName={state.teams[open.team].name}
-          rotated={isRotated(open.team)}
-          onAdd={(meld) => dispatch({ type: 'addMeld', team: open.team, meld })}
-          onClose={() => setOpen(null)}
-        />
-      )}
-      {open?.kind === 'points' && (
-        <PointsDialog
-          state={state}
-          team={open.team}
-          rotated={isRotated(open.team)}
-          onConfirm={(points) => {
-            dispatch({ type: 'confirmRound', team: open.team, points });
-            setOpen(null);
-          }}
-          onClose={() => setOpen(null)}
-        />
-      )}
-      {open?.kind === 'menu' && (
-        <MenuDialog
-          state={state}
-          rotateTop={rotateTop}
-          onToggleRotate={toggleRotate}
-          onUndo={() => dispatch({ type: 'undoRound' })}
-          onNewGame={() => dispatch({ type: 'newGame' })}
-          onShowRules={() => setOpen({ kind: 'rules' })}
-          onClose={() => setOpen(null)}
-        />
-      )}
-      {open?.kind === 'rules' && <RulesDialog onClose={() => setOpen({ kind: 'menu' })} />}
-    </main>
+        {showTie && tie && (
+          <TieDialog
+            tie={tie}
+            teamNames={[state.teams[0].name, state.teams[1].name]}
+            melds={state.pendingMelds}
+            rotateTop={rotateTop}
+            requiredForPoints={pointsAfterTie !== null}
+            onPick={(team, rank) => dispatch({ type: 'setMeldRank', team, meldType: tie.type, rank })}
+            onLater={() => {
+              setPostponedTie(tieKey);
+              setPointsAfterTie(null);
+            }}
+          />
+        )}
+        {winner !== null && open === null && (
+          <WinnerDialog
+            winnerName={state.teams[winner].name}
+            scores={[totalScore(state, 0), totalScore(state, 1)]}
+            teamNames={[state.teams[0].name, state.teams[1].name]}
+            wins={[totalWins(state, 0), totalWins(state, 1)]}
+            award={winAward(state)!.wins}
+            onUndo={() => dispatch({ type: 'undoRound' })}
+            onNextGame={() => dispatch({ type: 'nextGame' })}
+          />
+        )}
+        {open?.kind === 'meld' && (
+          <MeldDialog
+            teamName={state.teams[open.team].name}
+            rotated={isRotated(open.team)}
+            onAdd={(meld) => dispatch({ type: 'addMeld', team: open.team, meld })}
+            onClose={() => setOpen(null)}
+          />
+        )}
+        {open?.kind === 'points' && (
+          <PointsDialog
+            state={state}
+            team={open.team}
+            rotated={isRotated(open.team)}
+            onConfirm={(points) => {
+              dispatch({ type: 'confirmRound', team: open.team, points });
+              setOpen(null);
+            }}
+            onClose={() => setOpen(null)}
+          />
+        )}
+        {open?.kind === 'menu' && (
+          <MenuDialog
+            state={state}
+            rotateTop={rotateTop}
+            onToggleRotate={toggleRotate}
+            onUndo={() => dispatch({ type: 'undoRound' })}
+            onNewGame={() => dispatch({ type: 'newGame' })}
+            onShowRules={() => setOpen({ kind: 'rules' })}
+            onClose={() => setOpen(null)}
+          />
+        )}
+        {open?.kind === 'rules' && <RulesDialog onClose={() => setOpen({ kind: 'menu' })} />}
+      </main>
+    </div>
   );
 }
