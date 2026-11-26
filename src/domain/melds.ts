@@ -14,7 +14,8 @@ export interface Meld {
   type: MeldType;
   /**
    * Highest card of a sequence (Dreiblatt/Vierblatt/Fünfblatt) or the card of a Vierling.
-   * The suit is not needed – it never matters for the rules.
+   * Only asked when both teams have the same kind of Weis as their highest one
+   * (see `findMeldTie`). The suit is not needed – it never matters for the rules.
    */
   rank?: Rank;
 }
@@ -117,16 +118,20 @@ export const meldPoints = (meld: Meld): number => MELD_DEFINITIONS[meld.type].po
 /** Steck always counts and does not compete with the other melds. */
 export const isCompetingMeld = (meld: Meld): boolean => meld.type !== 'steck';
 
+/** Cards that can be chosen as "highest card" for a meld type (empty if none is needed). */
+export function possibleRanks(type: MeldType): Rank[] {
+  const def = MELD_DEFINITIONS[type];
+  if (def.needs === 'highRank') return possibleHighRanks(def.length!);
+  if (def.needs === 'rank') return VIERLING_RANKS;
+  return [];
+}
+
+/** A meld is valid without a card; if a card is given it must fit the meld type. */
 export function isValidMeld(meld: Meld): boolean {
   const def = MELD_DEFINITIONS[meld.type];
   if (!def) return false;
-  if (def.needs === 'highRank') {
-    return !!meld.rank && possibleHighRanks(def.length!).includes(meld.rank);
-  }
-  if (def.needs === 'rank') {
-    return !!meld.rank && VIERLING_RANKS.includes(meld.rank);
-  }
-  return true;
+  if (meld.rank === undefined) return true;
+  return possibleRanks(meld.type).includes(meld.rank);
 }
 
 function meldRankIndex(meld: Meld): number {
@@ -155,6 +160,39 @@ export function highestMeld(melds: Meld[]): Meld | null {
 
 export type MeldWinner = 0 | 1 | null;
 type TeamIndex = 0 | 1;
+
+export interface MeldTie {
+  /** The kind of Weis both teams have as their highest one. */
+  type: MeldType;
+  /** Per team: true if its highest card for this kind has not been chosen yet. */
+  missing: [boolean, boolean];
+}
+
+/**
+ * The highest card only matters if both teams' highest Weis is of the same kind
+ * (e.g. both a Dreiblatt). Returns that kind while a team still has to choose its
+ * highest card, otherwise null.
+ */
+export function findMeldTie(melds: [Meld[], Meld[]]): MeldTie | null {
+  const best0 = highestMeld(melds[0]);
+  const best1 = highestMeld(melds[1]);
+  if (!best0 || !best1 || best0.type !== best1.type) return null;
+  const type = best0.type;
+  if (possibleRanks(type).length === 0) return null;
+  const missing: [boolean, boolean] = [
+    !melds[0].some((m) => m.type === type && m.rank),
+    !melds[1].some((m) => m.type === type && m.rank),
+  ];
+  return missing[0] || missing[1] ? { type, missing } : null;
+}
+
+/** The chosen highest card of a team for a meld kind (the highest if several were chosen). */
+export function chosenRank(melds: Meld[], type: MeldType): Rank | undefined {
+  return melds
+    .filter((m) => m.type === type && m.rank)
+    .map((m) => m.rank!)
+    .sort((a, b) => rankIndex(b) - rankIndex(a))[0];
+}
 
 /**
  * Determines which team has the highest single meld.

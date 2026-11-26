@@ -4,8 +4,10 @@ import { MeldDialog } from './components/MeldDialog';
 import { MenuDialog } from './components/MenuDialog';
 import { PointsDialog } from './components/PointsDialog';
 import { TeamPanel } from './components/TeamPanel';
+import { TieDialog } from './components/TieDialog';
 import { WinnerDialog } from './components/WinnerDialog';
 import { TARGET_SCORE, type TeamIndex, gameWinner, totalScore, totalWins, winAward } from './domain/game';
+import { findMeldTie } from './domain/melds';
 import { useGame } from './state/useGame';
 import { useIdle } from './state/useIdle';
 import { IDLE_SHIFT_FACTOR, usePixelShift } from './state/usePixelShift';
@@ -29,8 +31,13 @@ export default function App() {
   const [open, setOpen] = useState<Open>(null);
   const [rotateTop, setRotateTop] = useState(readRotate);
   const winner = gameWinner(state);
+  // Both teams have the same kind of Weis → ask for the highest card (unless postponed with "Später").
+  const tie = findMeldTie(state.pendingMelds);
+  const tieKey = tie ? `${state.round}:${tie.type}` : null;
+  const [postponedTie, setPostponedTie] = useState<string | null>(null);
+  const showTie = tie !== null && open === null && winner === null && postponedTie !== tieKey;
   // Black outline mode after 30 s without a tap (not while a dialog is open) – protects OLED screens.
-  const idle = useIdle(undefined, open !== null || winner !== null);
+  const idle = useIdle(undefined, open !== null || winner !== null || showTie);
   const [baseX, baseY] = usePixelShift();
   const shiftFactor = idle ? IDLE_SHIFT_FACTOR : 1;
   const shiftX = baseX * shiftFactor;
@@ -86,6 +93,16 @@ export default function App() {
       />
       {panel(1)}
 
+      {showTie && tie && (
+        <TieDialog
+          tie={tie}
+          teamNames={[state.teams[0].name, state.teams[1].name]}
+          melds={state.pendingMelds}
+          rotateTop={rotateTop}
+          onPick={(team, rank) => dispatch({ type: 'setMeldRank', team, meldType: tie.type, rank })}
+          onLater={() => setPostponedTie(tieKey)}
+        />
+      )}
       {winner !== null && open === null && (
         <WinnerDialog
           winnerName={state.teams[winner].name}
@@ -110,6 +127,10 @@ export default function App() {
           state={state}
           team={open.team}
           rotated={isRotated(open.team)}
+          onResolveTie={() => {
+            setPostponedTie(null);
+            setOpen(null);
+          }}
           onConfirm={(points) => {
             dispatch({ type: 'confirmRound', team: open.team, points });
             setOpen(null);

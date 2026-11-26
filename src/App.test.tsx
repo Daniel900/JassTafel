@@ -14,11 +14,11 @@ describe('App', () => {
     const { unmount } = render(<App />);
     expect(screen.getByTestId('round')).toHaveTextContent('Runde 1');
 
-    // Team 2 melds a Vierblatt up to Ass
+    // Team 2 melds a Vierblatt – one tap, no card question (Team 1 has nothing comparable)
     await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Melden' }));
     await user.click(screen.getByRole('button', { name: 'Vierblatt' }));
-    await user.click(screen.getByRole('button', { name: 'Vierblatt bis Ass' }));
-    expect(within(screen.getByTestId('team-1')).getByText(/Vierblatt bis Ass/)).toBeInTheDocument();
+    expect(within(screen.getByTestId('team-1')).getByText(/Vierblatt/)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     // Team 1 has a Steck
     await user.click(within(screen.getByTestId('team-0')).getByRole('button', { name: 'Melden' }));
@@ -38,6 +38,48 @@ describe('App', () => {
     expect(screen.getByTestId('total-0')).toHaveTextContent('80');
     expect(screen.getByTestId('total-1')).toHaveTextContent('147');
     expect(screen.getByTestId('round')).toHaveTextContent('Runde 2');
+  });
+
+  it('asks both teams for their highest card only when both meld the same kind', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    const meld = async (team: 0 | 1, name: string) => {
+      await user.click(within(screen.getByTestId(`team-${team}`)).getByRole('button', { name: 'Melden' }));
+      await user.click(screen.getByRole('button', { name }));
+    };
+    await meld(0, 'Dreiblatt');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // second team melds the same kind → split screen appears
+    await meld(1, 'Dreiblatt');
+    const tie = screen.getByRole('dialog', { name: 'Gleicher Weis' });
+    await user.click(within(within(tie).getByTestId('tie-0')).getByRole('button', { name: 'Dreiblatt bis König' }));
+    expect(screen.getByRole('dialog', { name: 'Gleicher Weis' })).toBeInTheDocument(); // team 2 still open
+    await user.click(within(within(tie).getByTestId('tie-1')).getByRole('button', { name: 'Dreiblatt bis Ass' }));
+    expect(screen.queryByRole('dialog', { name: 'Gleicher Weis' })).not.toBeInTheDocument();
+    expect(within(screen.getByTestId('team-1')).getByText(/Dreiblatt bis Ass/)).toBeInTheDocument();
+
+    // Team 2 has the higher Dreiblatt → only Team 2's Weis counts (Team 1 has Trumpf, but Ass > König)
+    await user.click(within(screen.getByTestId('team-0')).getByRole('button', { name: 'Punkte' }));
+    await enter(user, '80');
+    expect(screen.getByTestId('total-0')).toHaveTextContent('80');
+    expect(screen.getByTestId('total-1')).toHaveTextContent('97'); // 77 + 20
+  });
+
+  it('can postpone the card question and open it again from the points screen', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    for (const team of [0, 1] as const) {
+      await user.click(within(screen.getByTestId(`team-${team}`)).getByRole('button', { name: 'Melden' }));
+      await user.click(screen.getByRole('button', { name: 'Vierling' }));
+    }
+    await user.click(screen.getByRole('button', { name: 'Später' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
+    expect(screen.getByTestId('tie-hint')).toHaveTextContent('Beide haben Vierling');
+    await user.click(screen.getByRole('button', { name: 'Jetzt wählen' }));
+    expect(screen.getByRole('dialog', { name: 'Gleicher Weis' })).toBeInTheDocument();
   });
 
   it('undoes the last round from the menu', async () => {

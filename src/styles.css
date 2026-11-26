@@ -310,3 +310,42 @@ body:has(.tafel--idle) { background: #000; }
 .tafel--idle .trump-badge.active { border: 1px solid var(--idle-fg); color: var(--idle-fg); background: transparent; opacity: 1; }
 .winner__award { margin: 0; font-weight: 700; color: #16a34a; }
 .preview__head { color: var(--surface-muted); font-size: 0.8rem; }
+
+/* ---- Same kind of Weis for both teams: each team picks its highest card on its half ---- */
+.tie {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  background: var(--felt-dark);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.tie__half {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  min-height: 0;
+  overflow-y: auto;
+}
+.tie__half--0 { background: var(--team-0); }
+.tie__half--1 { background: var(--team-1); }
+.tie__title { margin: 0; font-size: 1.05rem; text-align: center; }
+.tie__status { margin: 0; text-align: center; color: var(--muted); font-size: 0.85rem; }
+.tie__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--felt-dark);
+  border-block: 2px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.95rem;
+}
+.tie__later { color: var(--accent); }
+.tie .rank-picker { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.rank-option { padding: 8px 4px; gap: 4px; border-color: rgba(255, 255, 255, 0.35); background: rgba(255, 255, 255, 0.92); color: var(--surface-text, #0f172a); }
+.rank-option .meld-option__name { font-size: 0.85rem; color: #0f172a; }
+.rank-option.selected { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
