@@ -181,7 +181,7 @@ export function RulesDialog({ onClose }: Props) {
           </p>
           <ol>
             <li>Zuerst zählen die Punkte (z. B. Vierblatt 50 schlägt Dreiblatt 20).</li>
-            <li>Bei gleichen Punkten schlägt der Fünfblatt den Vierling.</li>
+            <li>Bei gleichen Punkten schlägt das Fünfblatt den Vierling.</li>
             <li>
               Bei gleicher Art (z. B. beide ein Dreiblatt) gewinnt die <strong>höhere Karte</strong> – bei Folgen die
               höchste Karte der Folge, beim Vierling die Karte selbst. Die Farbe spielt keine Rolle.
@@ -216,11 +216,11 @@ export function RulesDialog({ onClose }: Props) {
         <Section title="8. So bedient ihr die Tafel">
           <ul>
             <li>
-              <strong>Melden:</strong> Während der Runde tippt jedes Team auf seiner Hälfte auf «Melden» und wählt den
+              <strong>Melden:</strong> Während der Runde tippt jedes Team auf seiner Hälfte auf «Melden» und wählt die
               Meldung – ein Tipp genügt. Falsch gemeldet? Mit dem ✕ an der Meldung wieder entfernen.
             </li>
             <li>
-              <strong>Höchste Karte:</strong> Haben beide Teams als höchste Meldung die gleiche Art (z. B. beide einen
+              <strong>Höchste Karte:</strong> Haben beide Teams als höchste Meldung die gleiche Art (z. B. beide ein
               Dreiblatt), erscheint ein geteilter Bildschirm: Jedes Team wählt auf seiner Seite seine höchste Karte. Mit
               «Später» kann man das verschieben, vor dem Eintragen der Punkte muss es aber gewählt sein.
             </li>
