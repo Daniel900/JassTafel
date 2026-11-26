@@ -6,7 +6,7 @@ import { MenuDialog } from './MenuDialog';
 describe('MenuDialog', () => {
   it('shows the history and offers undo / new game', async () => {
     const state = gameReducer(createGame(), { type: 'confirmRound', team: 0, points: 100 });
-    const props = { onToggleRotate: vi.fn(), onUndo: vi.fn(), onNewGame: vi.fn(), onClose: vi.fn() };
+    const props = { onToggleRotate: vi.fn(), onUndo: vi.fn(), onNewGame: vi.fn(), onShowRules: vi.fn(), onClose: vi.fn() };
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<MenuDialog state={state} rotateTop {...props} />);
     const user = userEvent.setup();
@@ -18,11 +18,21 @@ describe('MenuDialog', () => {
     expect(props.onUndo).toHaveBeenCalled();
     expect(props.onNewGame).toHaveBeenCalled();
     expect(props.onToggleRotate).toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Regeln & Anleitung' }));
+    expect(props.onShowRules).toHaveBeenCalled();
   });
 
   it('disables undo without history', () => {
     render(
-      <MenuDialog state={createGame()} rotateTop onToggleRotate={vi.fn()} onUndo={vi.fn()} onNewGame={vi.fn()} onClose={vi.fn()} />,
+      <MenuDialog
+        state={createGame()}
+        rotateTop
+        onToggleRotate={vi.fn()}
+        onUndo={vi.fn()}
+        onNewGame={vi.fn()}
+        onShowRules={vi.fn()}
+        onClose={vi.fn()}
+      />,
     );
     expect(screen.getByRole('button', { name: 'Letzte Runde rückgängig' })).toBeDisabled();
   });

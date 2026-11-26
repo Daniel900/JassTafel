@@ -172,6 +172,16 @@ describe('App', () => {
     }
   });
 
+  it('opens the rules from the menu and returns to the menu', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: 'Menü' }));
+    await user.click(screen.getByRole('button', { name: 'Regeln & Anleitung' }));
+    expect(screen.getByRole('dialog', { name: 'Regeln & Anleitung' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Schliessen' }));
+    expect(screen.getByRole('dialog', { name: 'Menü' })).toBeInTheDocument();
+  });
+
   it('renames a team', async () => {
     vi.spyOn(window, 'prompt').mockReturnValue('Die Bauern');
     const user = userEvent.setup();
