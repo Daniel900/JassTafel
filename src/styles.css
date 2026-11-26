@@ -63,8 +63,10 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 16px;
+  /* sizes below adapt to the height of the half (cqh), e.g. when the iPhone status bar takes space */
+  container-type: size;
+  gap: clamp(4px, 2.5cqh, 10px);
+  padding: clamp(8px, 4cqh, 16px) 16px;
   min-height: 0;
   overflow: hidden;
 }
@@ -81,7 +83,7 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 }
 
 .team__total {
-  font-size: clamp(3rem, 15vw, 5.5rem);
+  font-size: clamp(2.25rem, min(15cqw, 24cqh), 5.5rem);
   font-weight: 800;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -95,7 +97,9 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  max-height: 30%;
+  /* never squeezed: up to two rows of Meldungen are fully visible, more rows scroll */
+  flex-shrink: 0;
+  max-height: 80px;
   overflow-y: auto;
 }
 
@@ -120,6 +124,7 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 }
 
 .team__actions { display: flex; gap: 12px; width: 100%; max-width: 360px; }
+.team__actions > button { min-height: clamp(42px, 19cqh, 52px); }
 .team__actions > button { flex: 1; }
 
 .primary-btn, .secondary-btn {
