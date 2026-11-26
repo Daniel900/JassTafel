@@ -58,9 +58,10 @@ export function TeamPanel({
       </div>
       <div className="team__stats">
         <span data-testid={`remaining-${index}`}>{remaining > 0 ? `noch ${remaining}` : 'Ziel erreicht'}</span>
-        <span className="team__wins" data-testid={`wins-${index}`}>
-          {wins === 1 ? '1 Sieg' : `${wins} Siege`}
-        </span>
+      </div>
+      {/* Sits at the inner edge of the half, next to the round bar */}
+      <div className="team__wins" data-testid={`wins-${index}`}>
+        {wins === 1 ? '1 Sieg' : `${wins} Siege`}
       </div>
       <ul className="team__melds" aria-label="Weis dieser Runde">
         {melds.map((m) => (
