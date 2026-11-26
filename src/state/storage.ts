@@ -32,6 +32,7 @@ function migrate(saved: GameState): GameState {
   return {
     ...state,
     trumpTeam: state.trumpTeam ?? (((state.round - 1) % 2) as 0 | 1),
+    wins: Array.isArray(state.wins) && state.wins.length === 2 ? state.wins : [0, 0],
     pendingMelds: migrateMelds(state.pendingMelds),
     history: state.history.map((round, i) => {
       const { trump: _t, ...r } = round as typeof round & { trump?: unknown };

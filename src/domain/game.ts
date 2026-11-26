@@ -22,6 +22,8 @@ export interface RoundResult {
 
 /** The game is won by the first team reaching this score. */
 export const TARGET_SCORE = 1000;
+/** If the losing team has fewer points than this, the winner gets 2 wins instead of 1. */
+export const DOUBLE_WIN_THRESHOLD = 500;
 
 export interface GameState {
   version: 1;
@@ -34,6 +36,8 @@ export interface GameState {
   /** Melds announced during the current round. */
   pendingMelds: [Meld[], Meld[]];
   history: RoundResult[];
+  /** Games won in earlier games of this Jass evening (current game not included). */
+  wins: [number, number];
 }
 
 export const createGame = (teams: [string, string] = ['Team 1', 'Team 2']): GameState => ({
@@ -44,6 +48,7 @@ export const createGame = (teams: [string, string] = ['Team 1', 'Team 2']): Game
   trumpTeam: 0,
   pendingMelds: [[], []],
   history: [],
+  wins: [0, 0],
 });
 
 export type GameAction =
@@ -53,6 +58,9 @@ export type GameAction =
   | { type: 'confirmRound'; team: TeamIndex; points: number }
   | { type: 'undoRound' }
   | { type: 'renameTeam'; team: TeamIndex; name: string }
+  /** End screen: start the next game, books the win and keeps the win counter. */
+  | { type: 'nextGame' }
+  /** Menu: start a new Jass evening – resets points and the win counter. */
   | { type: 'newGame' };
 
 const other = (team: TeamIndex): TeamIndex => (team === 0 ? 1 : 0);
@@ -123,8 +131,15 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const name = action.name.trim() || `Team ${action.team + 1}`;
       return { ...state, teams: updateTeamList(state.teams, action.team, { name }) };
     }
+    case 'nextGame': {
+      const award = winAward(state);
+      if (!award) return state;
+      const wins = updateTeamList(state.wins, award.team, state.wins[award.team] + award.wins);
+      // Trumpf keeps alternating: the team after the last round's Trumpf team starts the next game.
+      return { ...createGame([state.teams[0].name, state.teams[1].name]), wins, trumpTeam: state.trumpTeam };
+    }
     case 'newGame':
-      return { ...createGame([state.teams[0].name, state.teams[1].name]) };
+      return createGame([state.teams[0].name, state.teams[1].name]);
   }
 }
 
@@ -147,5 +162,22 @@ export function gameWinner(state: GameState, target = TARGET_SCORE): TeamIndex |
 }
 
 export const isGameOver = (state: GameState): boolean => gameWinner(state) !== null;
+
+/**
+ * Wins the winner of the finished game gets: 2 if the losing team has fewer than
+ * 500 points, otherwise 1. Null while the game is still running.
+ */
+export function winAward(state: GameState): { team: TeamIndex; wins: 1 | 2 } | null {
+  const winner = gameWinner(state);
+  if (winner === null) return null;
+  const loserScore = totalScore(state, other(winner));
+  return { team: winner, wins: loserScore < DOUBLE_WIN_THRESHOLD ? 2 : 1 };
+}
+
+/** Wins of a team including the just finished game (shown before "Nächstes Spiel" is tapped). */
+export function totalWins(state: GameState, team: TeamIndex): number {
+  const award = winAward(state);
+  return state.wins[team] + (award?.team === team ? award.wins : 0);
+}
 
 export { other as otherTeam };

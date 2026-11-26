@@ -9,6 +9,8 @@ interface Props {
   rotated?: boolean;
   /** Remaining points until the target score. */
   remaining: number;
+  /** Games won this Jass evening. */
+  wins: number;
   hasTrump: boolean;
   disabled?: boolean;
   onTakeTrump: () => void;
@@ -25,6 +27,7 @@ export function TeamPanel({
   melds,
   rotated,
   remaining,
+  wins,
   hasTrump,
   disabled,
   onTakeTrump,
@@ -53,8 +56,12 @@ export function TeamPanel({
       <div className="team__total" data-testid={`total-${index}`}>
         {total}
       </div>
-      <div className="team__remaining" data-testid={`remaining-${index}`}>
-        {remaining > 0 ? `noch ${remaining}` : 'Ziel erreicht'}
+      <div className="team__stats">
+        <span data-testid={`remaining-${index}`}>{remaining > 0 ? `noch ${remaining}` : 'Ziel erreicht'}</span>
+      </div>
+      {/* Sits at the inner edge of the half, next to the round bar */}
+      <div className="team__wins" data-testid={`wins-${index}`}>
+        {wins === 1 ? '1 Sieg' : `${wins} Siege`}
       </div>
       <ul className="team__melds" aria-label="Weis dieser Runde">
         {melds.map((m) => (

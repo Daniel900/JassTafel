@@ -13,7 +13,7 @@ describe('MenuDialog', () => {
     expect(screen.getByRole('cell', { name: '100' })).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: '57' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Letzte Runde rückgängig' }));
-    await user.click(screen.getByRole('button', { name: 'Neues Spiel' }));
+    await user.click(screen.getByRole('button', { name: 'Neuer Jass-Abend' }));
     await user.click(screen.getByRole('checkbox'));
     expect(props.onUndo).toHaveBeenCalled();
     expect(props.onNewGame).toHaveBeenCalled();

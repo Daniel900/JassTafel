@@ -234,7 +234,21 @@ button { font: inherit; cursor: pointer; touch-action: manipulation; }
 .history__meld { color: #16a34a; font-weight: 600; }
 
 .team__head { display: flex; align-items: center; gap: 10px; }
-.team__remaining { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.team__stats { display: flex; gap: 14px; color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.team { position: relative; }
+/* Win counter: at the edge next to the round bar, lined up under "Runde" */
+.team__wins {
+  position: absolute;
+  left: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+}
+/* bottom team: the bar is above it */
+.team--1 .team__wins { top: 10px; }
+/* top team: the bar is below it (in DOM coordinates: bottom, or top when the half is rotated) */
+.team--0 .team__wins { bottom: 10px; }
+.team--0.rotated .team__wins { bottom: auto; top: 10px; left: auto; right: 12px; }
 .trump-badge {
   border-radius: 999px;
   padding: 4px 12px;
@@ -280,7 +294,8 @@ body:has(.tafel--idle) { background: #000; }
 .tafel--idle { background: #000; }
 .tafel--idle .team { background: #000; color: var(--idle-fg); }
 .tafel--idle .team__name,
-.tafel--idle .team__remaining { color: var(--idle-fg); }
+.tafel--idle .team__stats,
+.tafel--idle .team__wins { color: var(--idle-fg); }
 .tafel--idle .center-bar { background: #000; color: var(--idle-fg); border-block: 1px solid var(--idle-fg); }
 .tafel--idle .primary-btn,
 .tafel--idle .secondary-btn {
@@ -293,3 +308,5 @@ body:has(.tafel--idle) { background: #000; }
 .tafel--idle .chip__remove { background: transparent; color: var(--idle-fg); }
 .tafel--idle .trump-badge { border: 1px dashed var(--idle-fg); color: var(--idle-fg); background: transparent; opacity: 0.6; }
 .tafel--idle .trump-badge.active { border: 1px solid var(--idle-fg); color: var(--idle-fg); background: transparent; opacity: 1; }
+.winner__award { margin: 0; font-weight: 700; color: #16a34a; }
+.preview__head { color: var(--surface-muted); font-size: 0.8rem; }

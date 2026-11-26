@@ -34,6 +34,13 @@ describe('storage', () => {
     expect(loaded.history[0]).not.toHaveProperty('trump');
   });
 
+  it('adds an empty win counter to games saved before it existed', () => {
+    const old = JSON.parse(JSON.stringify(createGame()));
+    delete old.wins;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(old));
+    expect(loadGame().wins).toEqual([0, 0]);
+  });
+
   it('migrates sequence melds that stored the full highest card', () => {
     const g = createGame();
     const old = JSON.parse(JSON.stringify(g));

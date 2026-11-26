@@ -64,9 +64,11 @@ describe('App', () => {
     expect(screen.getByTestId('trump-badge-0')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('shows the winner at 1000 points and allows a new game', async () => {
+  it('shows the winner at 1000 points, counts the wins and keeps them for the next game', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
     const user = userEvent.setup();
     render(<App />);
+    expect(screen.getByTestId('wins-1')).toHaveTextContent('0 Siege');
     for (let i = 0; i < 4; i++) {
       await user.click(within(screen.getByTestId('team-1')).getByRole('button', { name: 'Punkte' }));
       await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Match' }));
@@ -74,9 +76,19 @@ describe('App', () => {
     }
     const dialog = screen.getByRole('dialog', { name: 'Spielende' });
     expect(within(dialog).getByText('Team 2 gewinnt!')).toBeInTheDocument();
-    await user.click(within(dialog).getByRole('button', { name: 'Neues Spiel' }));
+    // team 1 has 0 points (< 500) → 2 wins
+    expect(within(dialog).getByTestId('award')).toHaveTextContent('+2 Siege');
+    expect(within(dialog).getByTestId('final-wins-1')).toHaveTextContent('2');
+
+    await user.click(within(dialog).getByRole('button', { name: 'Nächstes Spiel' }));
     expect(screen.getByTestId('total-1')).toHaveTextContent('0');
     expect(screen.getByTestId('round')).toHaveTextContent('Runde 1');
+    expect(screen.getByTestId('wins-1')).toHaveTextContent('2 Siege');
+
+    // "Neuer Jass-Abend" in the menu resets the win counter
+    await user.click(screen.getByRole('button', { name: 'Menü' }));
+    await user.click(screen.getByRole('button', { name: 'Neuer Jass-Abend' }));
+    expect(screen.getByTestId('wins-1')).toHaveTextContent('0 Siege');
   });
 
   it('switches to the black outline mode after 30 s and back on a tap, with buttons still working', async () => {
